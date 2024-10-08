@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Grid } from '@mui/material';
 import { keyframes } from '@emotion/react';
+import { SxProps, Theme } from '@mui/system';
 
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
@@ -80,9 +81,9 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
     }, 50);
   };
 
-  const getKeyStyle = (key: string) => {
+  const getKeyStyle = (key: string): SxProps<Theme> => {
     const isHighlighted = highlightedKeys.includes(key.toLowerCase());
-    const baseStyle = {
+    const baseStyle: SxProps<Theme> = {
       minWidth: 40,
       height: 40,
       padding: '4px',
@@ -98,7 +99,12 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
       '&:hover': {
         backgroundColor: '#D0BCFF',
       },
+      transform: 'scale(1)',
+      boxShadow: 'none',
+      animation: 'none',
     };
+
+    let style: SxProps<Theme> = { ...baseStyle };
 
     // Adjust width for specific keys
     switch (key) {
@@ -108,16 +114,16 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
       case 'Enter':
       case 'ShiftLeft':
       case 'ShiftRight':
-        return { ...baseStyle, minWidth: 70 };
+        (style as any).minWidth = 70;
+        break;
       case 'Space':
-        return { ...baseStyle, minWidth: 240 };
-      default:
-        return baseStyle;
+        (style as any).minWidth = 240;
+        break;
     }
 
     if (key === pressedKey) {
-      return {
-        ...baseStyle,
+      style = {
+        ...style,
         backgroundColor: '#D0BCFF',
         transform: 'scale(0.95)',
         boxShadow: '0 0 15px rgba(103, 80, 164, 0.5)',
@@ -126,14 +132,14 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
 
     if (runningLightKeys.includes(key.toLowerCase())) {
       const index = runningLightKeys.indexOf(key.toLowerCase());
-      return {
-        ...baseStyle,
+      style = {
+        ...style,
         animation: `${rainbowLights} 0.7s ease-in-out`,
         animationDelay: `${index * 0.05}s`,
       };
     }
 
-    return baseStyle;
+    return style;
   };
 
   const getKeyLabel = (key: string) => {
