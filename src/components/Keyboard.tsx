@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Button, Grid } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { SxProps, Theme } from '@mui/system';
@@ -32,14 +32,32 @@ const rainbowLights = keyframes`
 
 const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
   const [pressedKey, setPressedKey] = useState<string | null>(null);
-  const [runningLightKeys, setRunningLightKeys] = useState<string[]>([]);
+  const [rippleOrigin, setRippleOrigin] = useState<{ row: number; col: number } | null>(null);
+
+  const getKeyPosition = useCallback((key: string) => {
+    for (let row = 0; row < keys.length; row++) {
+      const col = keys[row].indexOf(key);
+      if (col !== -1) {
+        return { row, col };
+      }
+    }
+    return null;
+  }, []);
+
+  const triggerRippleEffect = useCallback((startKey: string) => {
+    const position = getKeyPosition(startKey);
+    if (position) {
+      setRippleOrigin(position);
+      setTimeout(() => setRippleOrigin(null), 1000); // Clear ripple effect after animation
+    }
+  }, [getKeyPosition]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key;
       setPressedKey(key);
       onKeyPress(key);
-      triggerRunningLights(key);
+      triggerRippleEffect(key);
     };
 
     const handleKeyUp = () => {
@@ -53,36 +71,12 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [onKeyPress]);
+  }, [onKeyPress, triggerRippleEffect]);
 
-  const triggerRunningLights = (startKey: string) => {
-    const flatKeys = keys.flat();
-    const startIndex = flatKeys.indexOf(startKey.toLowerCase());
-    const lightSequence = [
-      ...flatKeys.slice(startIndex),
-      ...flatKeys.slice(0, startIndex)
-    ];
-
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      setRunningLightKeys(prevKeys => {
-        const newKeys = [...prevKeys, lightSequence[currentIndex]];
-        if (newKeys.length > 7) {
-          newKeys.shift();
-        }
-        return newKeys;
-      });
-
-      currentIndex++;
-      if (currentIndex >= flatKeys.length) {
-        clearInterval(interval);
-        setTimeout(() => setRunningLightKeys([]), 500);
-      }
-    }, 50);
-  };
-
-  const getKeyStyle = (key: string): SxProps<Theme> => {
+  const getKeyStyle = useCallback((key: string): SxProps<Theme> => {
     const isHighlighted = highlightedKeys.includes(key.toLowerCase());
+    const keyPosition = getKeyPosition(key);
+    
     const baseStyle: SxProps<Theme> = {
       minWidth: 40,
       height: 40,
@@ -130,17 +124,21 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
       };
     }
 
-    if (runningLightKeys.includes(key.toLowerCase())) {
-      const index = runningLightKeys.indexOf(key.toLowerCase());
+    if (rippleOrigin && keyPosition) {
+      const distance = Math.sqrt(
+        Math.pow(rippleOrigin.row - keyPosition.row, 2) +
+        Math.pow(rippleOrigin.col - keyPosition.col, 2)
+      );
+      const delay = distance * 50; // 50ms delay per unit of distance
       style = {
         ...style,
         animation: `${rainbowLights} 0.7s ease-in-out`,
-        animationDelay: `${index * 0.05}s`,
+        animationDelay: `${delay}ms`,
       };
     }
 
     return style;
-  };
+  }, [pressedKey, rippleOrigin, highlightedKeys, getKeyPosition]);
 
   const getKeyLabel = (key: string) => {
     switch (key) {
@@ -178,7 +176,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
                 onMouseDown={() => {
                   setPressedKey(key);
                   onKeyPress(key);
-                  triggerRunningLights(key);
+                  triggerRippleEffect(key);
                 }}
                 onMouseUp={() => setPressedKey(null)}
                 onMouseLeave={() => setPressedKey(null)}
