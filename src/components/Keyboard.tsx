@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Button, Grid } from '@mui/material';
+import { Box, Button, Grid, Typography } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { SxProps, Theme } from '@mui/system';
+import { shuangpinData } from '../data/shuangpinData'; // 导入双拼数据
 
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
@@ -196,6 +197,14 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
     }
   };
 
+  const getShuangpinLabel = (key: string) => {
+    const lowerKey = key.toLowerCase();
+    if (shuangpinData[lowerKey]) {
+      return `${shuangpinData[lowerKey].shengmu || ''} ${shuangpinData[lowerKey].yunmu || ''}`.trim();
+    }
+    return '';
+  };
+
   return (
     <ErrorBoundary>
       <Box sx={{ 
@@ -221,9 +230,21 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
                   }}
                   onMouseUp={() => setPressedKey(null)}
                   onMouseLeave={() => setPressedKey(null)}
-                  sx={getKeyStyle(key)}
+                  sx={{
+                    ...getKeyStyle(key),
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    lineHeight: 1,
+                  }}
                 >
-                  {getKeyLabel(key)}
+                  <Typography variant="body2" component="div">
+                    {getKeyLabel(key)}
+                  </Typography>
+                  <Typography variant="caption" component="div" sx={{ fontSize: '0.6rem', opacity: 0.7 }}>
+                    {getShuangpinLabel(key)}
+                  </Typography>
                 </Button>
               </Grid>
             ))}
