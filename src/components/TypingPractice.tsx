@@ -1,85 +1,55 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Typography, Paper } from '@mui/material';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Box, Typography } from '@mui/material';
 import Keyboard from './Keyboard';
-import { articles } from '../data/shuangpinData';
 
 const TypingPractice: React.FC = () => {
-  const [currentArticle, setCurrentArticle] = useState({ text: '', shuangpin: '' });
-  const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const [currentShuangpinIndex, setCurrentShuangpinIndex] = useState(0);
-  const [typedShuangpin, setTypedShuangpin] = useState('');
-  const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
+  console.log('TypingPractice component function called');
 
-  useEffect(() => {
-    selectRandomArticle();
-  }, []);
-
-  const selectRandomArticle = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * articles.length);
-    setCurrentArticle(articles[randomIndex]);
-    setCurrentCharIndex(0);
-    setCurrentShuangpinIndex(0);
-    setTypedShuangpin('');
-    updateHighlightedKeys(articles[randomIndex].shuangpin.split(' ')[0]);
-  }, []);
-
-  const updateHighlightedKeys = (currentShuangpin: string) => {
-    const keys = currentShuangpin.split('');
-    setHighlightedKeys(keys);
-  };
+  const [text, setText] = useState<string>('Hello, world!'); // 示例文本
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [currentKey, setCurrentKey] = useState<string>(text[0]);
+  const renderCount = useRef(0);
 
   const handleKeyPress = useCallback((key: string) => {
-    const currentShuangpin = currentArticle.shuangpin.split(' ')[currentShuangpinIndex];
-    if (key.toLowerCase() === currentShuangpin[typedShuangpin.length]) {
-      const newTypedShuangpin = typedShuangpin + key.toLowerCase();
-      setTypedShuangpin(newTypedShuangpin);
-
-      if (newTypedShuangpin === currentShuangpin) {
-        // Move to the next character
-        const nextCharIndex = currentCharIndex + 1;
-        const nextShuangpinIndex = currentShuangpinIndex + 1;
-        setCurrentCharIndex(nextCharIndex);
-        setCurrentShuangpinIndex(nextShuangpinIndex);
-        setTypedShuangpin('');
-
-        if (nextCharIndex === currentArticle.text.length) {
-          // Article completed, select a new one
-          selectRandomArticle();
-        } else {
-          updateHighlightedKeys(currentArticle.shuangpin.split(' ')[nextShuangpinIndex]);
-        }
+    console.log('handleKeyPress called with key:', key);
+    if (key.toLowerCase() === text[currentIndex].toLowerCase()) {
+      if (currentIndex < text.length - 1) {
+        setCurrentIndex(prevIndex => {
+          console.log('Updating currentIndex from', prevIndex, 'to', prevIndex + 1);
+          return prevIndex + 1;
+        });
+      } else {
+        console.log('练习完成！重置 currentIndex');
+        setCurrentIndex(0);
       }
     }
-  }, [currentArticle, currentCharIndex, currentShuangpinIndex, typedShuangpin, selectRandomArticle]);
+  }, [currentIndex, text]);
+
+  useEffect(() => {
+    console.log('Effect: updating currentKey. currentIndex:', currentIndex);
+    setCurrentKey(text[currentIndex]);
+  }, [currentIndex, text]);
+
+  useEffect(() => {
+    renderCount.current += 1;
+    console.log('Render count:', renderCount.current);
+  });
+
+  console.log('Rendering TypingPractice. currentIndex:', currentIndex, 'currentKey:', currentKey);
 
   return (
-    <Box sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 2, mb: 2, backgroundColor: '#F3EDF7' }}>
-        <Typography variant="h6" gutterBottom>
-          Type the following text using Shuangpin:
-        </Typography>
-        <Typography variant="body1">
-          {currentArticle.text.split('').map((char, index) => (
-            <span
-              key={index}
-              style={{
-                color: index < currentCharIndex ? 'green' : 'black',
-                backgroundColor: index === currentCharIndex ? '#E8DEF8' : 'transparent',
-                padding: '0 2px',
-              }}
-            >
-              {char}
-            </span>
-          ))}
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-          Current Shuangpin: {currentArticle.shuangpin.split(' ')[currentShuangpinIndex]}
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-          Typed Shuangpin: {typedShuangpin}
-        </Typography>
-      </Paper>
-      <Keyboard onKeyPress={handleKeyPress} highlightedKeys={highlightedKeys} />
+    <Box sx={{ textAlign: 'center', p: 2 }}>
+      <Typography variant="h4" gutterBottom>
+        打字练习
+      </Typography>
+      <Typography variant="body1" sx={{ mb: 2, fontSize: '1.2rem' }}>
+        {text.split('').map((char, index) => (
+          <span key={index} style={{ color: index < currentIndex ? 'green' : index === currentIndex ? 'blue' : 'black' }}>
+            {char}
+          </span>
+        ))}
+      </Typography>
+      <Keyboard onKeyPress={handleKeyPress} currentKey={currentKey} />
     </Box>
   );
 };

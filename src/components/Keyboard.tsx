@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Button, Grid } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { SxProps, Theme } from '@mui/system';
 
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
-  highlightedKeys: string[];
+  currentKey: string; // 新增：当前需要点击的按键
 }
 
 const keys = [
@@ -30,9 +30,35 @@ const rainbowLights = keyframes`
   85% { box-shadow: 0 0 5px ${rainbowColors[6]}, 0 0 10px ${rainbowColors[6]}, 0 0 15px ${rainbowColors[6]}; }
 `;
 
-const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
+  constructor(props: {children: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: any, errorInfo: any) {
+    console.log('Keyboard error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong with the Keyboard.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
+
+const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
+  console.log('Rendering Keyboard. currentKey:', currentKey);
+
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [rippleOrigin, setRippleOrigin] = useState<{ row: number; col: number } | null>(null);
+  const renderCount = useRef(0);
 
   const getKeyPosition = useCallback((key: string) => {
     for (let row = 0; row < keys.length; row++) {
@@ -73,8 +99,13 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
     };
   }, [onKeyPress, triggerRippleEffect]);
 
+  useEffect(() => {
+    renderCount.current += 1;
+    console.log('Keyboard render count:', renderCount.current);
+  });
+
   const getKeyStyle = useCallback((key: string): SxProps<Theme> => {
-    const isHighlighted = highlightedKeys.includes(key.toLowerCase());
+    const isHighlighted = key.toLowerCase() === currentKey.toLowerCase();
     const keyPosition = getKeyPosition(key);
     
     const baseStyle: SxProps<Theme> = {
@@ -137,8 +168,17 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
       };
     }
 
+    if (isHighlighted) {
+      style = {
+        ...style,
+        backgroundColor: '#FFA726', // 使用更明显的颜色
+        boxShadow: '0 0 15px rgba(255, 167, 38, 0.7)',
+        animation: `${rainbowLights} 1.5s infinite`,
+      };
+    }
+
     return style;
-  }, [pressedKey, rippleOrigin, highlightedKeys, getKeyPosition]);
+  }, [pressedKey, rippleOrigin, currentKey, getKeyPosition]);
 
   const getKeyLabel = (key: string) => {
     switch (key) {
@@ -157,38 +197,40 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
   };
 
   return (
-    <Box sx={{ 
-      mt: 2, 
-      p: 2, 
-      borderRadius: '10px',
-      backgroundColor: '#F3EDF7',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-      width: '100%',
-      maxWidth: '900px',
-      margin: '0 auto',
-    }}>
-      {keys.map((row, rowIndex) => (
-        <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
-          {row.map((key) => (
-            <Grid item key={key}>
-              <Button
-                variant="contained"
-                onMouseDown={() => {
-                  setPressedKey(key);
-                  onKeyPress(key);
-                  triggerRippleEffect(key);
-                }}
-                onMouseUp={() => setPressedKey(null)}
-                onMouseLeave={() => setPressedKey(null)}
-                sx={getKeyStyle(key)}
-              >
-                {getKeyLabel(key)}
-              </Button>
-            </Grid>
-          ))}
-        </Grid>
-      ))}
-    </Box>
+    <ErrorBoundary>
+      <Box sx={{ 
+        mt: 2, 
+        p: 2, 
+        borderRadius: '10px',
+        backgroundColor: '#F3EDF7',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        width: '100%',
+        maxWidth: '900px',
+        margin: '0 auto',
+      }}>
+        {keys.map((row, rowIndex) => (
+          <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
+            {row.map((key) => (
+              <Grid item key={key}>
+                <Button
+                  variant="contained"
+                  onMouseDown={() => {
+                    setPressedKey(key);
+                    onKeyPress(key);
+                    triggerRippleEffect(key);
+                  }}
+                  onMouseUp={() => setPressedKey(null)}
+                  onMouseLeave={() => setPressedKey(null)}
+                  sx={getKeyStyle(key)}
+                >
+                  {getKeyLabel(key)}
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
+        ))}
+      </Box>
+    </ErrorBoundary>
   );
 };
 
