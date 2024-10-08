@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 import Keyboard from './Keyboard';
-import { articles, shuangpinScheme } from '../data/shuangpinData';
+import { articles } from '../data/shuangpinData';
 
 const TypingPractice: React.FC = () => {
   const [currentArticle, setCurrentArticle] = useState({ text: '', shuangpin: '' });

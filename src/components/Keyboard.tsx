@@ -83,20 +83,37 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
   const getKeyStyle = (key: string) => {
     const isHighlighted = highlightedKeys.includes(key.toLowerCase());
     const baseStyle = {
-      minWidth: key === 'Space' ? 200 : key.length > 1 ? 70 : 50,
-      height: 50,
+      minWidth: 40,
+      height: 40,
+      padding: '4px',
+      fontSize: '0.8rem',
       fontWeight: 'bold',
       transition: 'all 0.1s ease',
       position: 'relative',
       overflow: 'visible',
       border: '2px solid #6750A4',
-      borderRadius: '8px',
+      borderRadius: '4px',
       backgroundColor: isHighlighted ? '#E8DEF8' : '#EADDFF',
       color: '#1C1B1F',
       '&:hover': {
         backgroundColor: '#D0BCFF',
       },
     };
+
+    // Adjust width for specific keys
+    switch (key) {
+      case 'Backspace':
+      case 'Tab':
+      case 'CapsLock':
+      case 'Enter':
+      case 'ShiftLeft':
+      case 'ShiftRight':
+        return { ...baseStyle, minWidth: 70 };
+      case 'Space':
+        return { ...baseStyle, minWidth: 240 };
+      default:
+        return baseStyle;
+    }
 
     if (key === pressedKey) {
       return {
@@ -142,9 +159,12 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, highlightedKeys }) => {
       borderRadius: '10px',
       backgroundColor: '#F3EDF7',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+      width: '100%',
+      maxWidth: '900px',
+      margin: '0 auto',
     }}>
       {keys.map((row, rowIndex) => (
-        <Grid container justifyContent="center" key={rowIndex} spacing={1} sx={{ mb: 1 }}>
+        <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
           {row.map((key) => (
             <Grid item key={key}>
               <Button
