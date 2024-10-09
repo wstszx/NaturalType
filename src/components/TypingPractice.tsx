@@ -5,6 +5,12 @@ import { articles } from '../data/articles';
 import { shuangpinData } from '../data/shuangpinData';
 import { pinyin } from 'pinyin-pro';
 
+// 检查字符是否为标点符号或非汉字的函数
+const isPunctuationOrNonChinese = (char: string): boolean => {
+  const regex = /[^\u4e00-\u9fa5]/;
+  return regex.test(char);
+};
+
 // 修改获取汉字的双拼编码函数
 const getShuangpinCode = (char: string): ShuangpinCode => {
   const pinyinResult = pinyin(char, { toneType: 'none', type: 'array' })[0];
@@ -37,7 +43,7 @@ const TypingPractice: React.FC = () => {
   const [currentArticleIndex, setCurrentArticleIndex] = useState<number>(0);
   const [text, setText] = useState<string>(articles[0].content);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [currentChar, setCurrentChar] = useState<string>(text[0]);
+  const [currentChar, setCurrentChar] = useState<string>('');
   const [currentShuangpinCode, setCurrentShuangpinCode] = useState<ShuangpinCode>(['', '']);
   const [currentKeyIndex, setCurrentKeyIndex] = useState<number>(0);
   const [currentKey, setCurrentKey] = useState<string>('');
@@ -64,12 +70,19 @@ const TypingPractice: React.FC = () => {
       setCurrentKeyIndex(1);
       setCurrentKey(currentShuangpinCode[1].toLowerCase());
     }
-  }, [currentIndex, currentKey, currentShuangpinCode, text, typedKeys]);
+  }, [currentKey, currentShuangpinCode, typedKeys]);
 
   const moveToNextCharacter = useCallback(() => {
-    if (currentIndex < text.length - 1) {
-      const nextIndex = currentIndex + 1;
-      const nextChar = text[nextIndex];
+    let nextIndex = currentIndex + 1;
+    let nextChar = text[nextIndex];
+
+    // 跳过标点符号和非汉字字符
+    while (nextIndex < text.length && isPunctuationOrNonChinese(nextChar)) {
+      nextIndex++;
+      nextChar = text[nextIndex];
+    }
+
+    if (nextIndex < text.length) {
       const nextShuangpinCode = getShuangpinCode(nextChar);
       
       console.log(`Moving to next character: ${nextChar}, Shuangpin: ${nextShuangpinCode.join(', ')}`);
@@ -94,22 +107,26 @@ const TypingPractice: React.FC = () => {
     const nextIndex = (currentArticleIndex + 1) % articles.length;
     setCurrentArticleIndex(nextIndex);
     setText(articles[nextIndex].content);
-    setCurrentIndex(0);
+    setCurrentIndex(-1);
     setCurrentKeyIndex(0);
+    setTypedKeys([]);
   };
 
   useEffect(() => {
-    console.log(`Current char updated: ${text[currentIndex]}`);
-    setCurrentChar(text[currentIndex]);
-  }, [currentIndex, text]);
+    if (currentIndex === -1) {
+      moveToNextCharacter();
+    }
+  }, [currentIndex, moveToNextCharacter]);
 
   useEffect(() => {
-    const shuangpinCode = getShuangpinCode(currentChar);
-    console.log(`Shuangpin code for '${currentChar}': ${shuangpinCode[0]}, ${shuangpinCode[1]}`);
-    setCurrentShuangpinCode(shuangpinCode);
-    const newKey = currentKeyIndex === 0 ? shuangpinCode[0] : shuangpinCode[1];
-    console.log(`Setting new current key: ${newKey}`);
-    setCurrentKey(newKey.toLowerCase());
+    if (currentChar) {
+      const shuangpinCode = getShuangpinCode(currentChar);
+      console.log(`Shuangpin code for '${currentChar}': ${shuangpinCode[0]}, ${shuangpinCode[1]}`);
+      setCurrentShuangpinCode(shuangpinCode);
+      const newKey = currentKeyIndex === 0 ? shuangpinCode[0] : shuangpinCode[1];
+      console.log(`Setting new current key: ${newKey}`);
+      setCurrentKey(newKey.toLowerCase());
+    }
   }, [currentChar, currentKeyIndex]);
 
   useEffect(() => {
@@ -118,6 +135,11 @@ const TypingPractice: React.FC = () => {
     console.log('Current Shuangpin code:', currentShuangpinCode);
     console.log('Current Key:', currentKey);
   });
+
+  // 初始化
+  useEffect(() => {
+    moveToNextCharacter();
+  }, []);
 
   return (
     <Box sx={{ textAlign: 'center', p: 2 }}>
