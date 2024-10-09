@@ -6,7 +6,7 @@ import { shuangpinData } from '../data/shuangpinData';
 import { pinyin } from 'pinyin-pro';
 
 // 修改获取汉字的双拼编码函数
-const getShuangpinCode = (char: string): string[] => {
+const getShuangpinCode = (char: string): ShuangpinCode => {
   const pinyinResult = pinyin(char, { toneType: 'none', type: 'array' })[0];
   if (pinyinResult) {
     let shengmu = pinyinResult.slice(0, pinyinResult.indexOf(pinyinResult.match(/[aeiouv]/i)![0]));
@@ -25,50 +25,70 @@ const getShuangpinCode = (char: string): string[] => {
       return Array.isArray(keyYunmu) ? keyYunmu.includes(yunmu) : keyYunmu === yunmu;
     }) || '';
 
-    return [shengmuKey, yunmuKey];
+    return [shengmuKey, yunmuKey] as ShuangpinCode;
   }
   console.warn(`No Shuangpin code found for character: ${char}`);
-  return ['', ''];
+  return ['', ''] as ShuangpinCode;
 };
+
+type ShuangpinCode = [string, string];
 
 const TypingPractice: React.FC = () => {
   const [currentArticleIndex, setCurrentArticleIndex] = useState<number>(0);
   const [text, setText] = useState<string>(articles[0].content);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [currentChar, setCurrentChar] = useState<string>(text[0]);
-  const [currentShuangpinCode, setCurrentShuangpinCode] = useState<string[]>(['', '']);
+  const [currentShuangpinCode, setCurrentShuangpinCode] = useState<ShuangpinCode>(['', '']);
   const [currentKeyIndex, setCurrentKeyIndex] = useState<number>(0);
   const [currentKey, setCurrentKey] = useState<string>('');
+  const [typedKeys, setTypedKeys] = useState<string[]>([]);
   const renderCount = useRef(0);
 
-  // 修改 handleKeyPress 函数
   const handleKeyPress = useCallback((key: string) => {
-    console.log(`Key pressed: ${key}, Expected key: ${currentKey}`);
-    if (key.toLowerCase() === currentKey.toLowerCase()) {
-      if (currentKeyIndex === 0) {
-        console.log('Switching to second key of current character');
-        setCurrentKeyIndex(1);
-        setCurrentKey(currentShuangpinCode[1].toLowerCase());
-      } else {
-        if (currentIndex < text.length - 1) {
-          console.log('Moving to next character');
-          const nextIndex = currentIndex + 1;
-          const nextChar = text[nextIndex];
-          const [nextFirst, nextSecond] = getShuangpinCode(nextChar);
-          console.log(`Next char: ${nextChar}, Next Shuangpin: ${nextFirst}, ${nextSecond}`);
-          setCurrentIndex(nextIndex);
-          setCurrentKeyIndex(0);
-          setCurrentShuangpinCode([nextFirst, nextSecond]);
-          setCurrentKey(nextFirst.toLowerCase());
-        } else {
-          console.log('Reached end of text');
-          setCurrentIndex(0);
-          setCurrentKeyIndex(0);
-          setCurrentKey('');
-        }
-      }
+    const lowerCaseKey = key.toLowerCase();
+    const expectedKey = currentKey.toLowerCase();
+
+    console.log(`Key pressed: ${lowerCaseKey}, Expected key: ${expectedKey}`);
+
+    if (lowerCaseKey !== expectedKey) {
+      console.log('Incorrect key pressed');
+      return;
     }
-  }, [currentIndex, currentKeyIndex, currentShuangpinCode, text, currentKey]);
+
+    const newTypedKeys = [...typedKeys, lowerCaseKey];
+    setTypedKeys(newTypedKeys);
+
+    if (newTypedKeys.length === 2) {
+      moveToNextCharacter();
+    } else {
+      setCurrentKeyIndex(1);
+      setCurrentKey(currentShuangpinCode[1].toLowerCase());
+    }
+  }, [currentIndex, currentKey, currentShuangpinCode, text, typedKeys]);
+
+  const moveToNextCharacter = useCallback(() => {
+    if (currentIndex < text.length - 1) {
+      const nextIndex = currentIndex + 1;
+      const nextChar = text[nextIndex];
+      const nextShuangpinCode = getShuangpinCode(nextChar);
+      
+      console.log(`Moving to next character: ${nextChar}, Shuangpin: ${nextShuangpinCode.join(', ')}`);
+      
+      setCurrentIndex(nextIndex);
+      setCurrentChar(nextChar);
+      setCurrentShuangpinCode(nextShuangpinCode);
+      setCurrentKeyIndex(0);
+      setCurrentKey(nextShuangpinCode[0].toLowerCase());
+      setTypedKeys([]);
+    } else {
+      console.log('Reached end of text');
+      // 可以在这里添加完成练习的逻辑
+      setCurrentIndex(0);
+      setCurrentKeyIndex(0);
+      setCurrentKey('');
+      setTypedKeys([]);
+    }
+  }, [currentIndex, text]);
 
   const handleNextArticle = () => {
     const nextIndex = (currentArticleIndex + 1) % articles.length;
@@ -84,10 +104,10 @@ const TypingPractice: React.FC = () => {
   }, [currentIndex, text]);
 
   useEffect(() => {
-    const [first, second] = getShuangpinCode(currentChar);
-    console.log(`Shuangpin code for '${currentChar}': ${first}, ${second}`);
-    setCurrentShuangpinCode([first, second]);
-    const newKey = currentKeyIndex === 0 ? first : second;
+    const shuangpinCode = getShuangpinCode(currentChar);
+    console.log(`Shuangpin code for '${currentChar}': ${shuangpinCode[0]}, ${shuangpinCode[1]}`);
+    setCurrentShuangpinCode(shuangpinCode);
+    const newKey = currentKeyIndex === 0 ? shuangpinCode[0] : shuangpinCode[1];
     console.log(`Setting new current key: ${newKey}`);
     setCurrentKey(newKey.toLowerCase());
   }, [currentChar, currentKeyIndex]);
