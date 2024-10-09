@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, Container } from '@mui/material';
 import Keyboard from './Keyboard';
 import { articles } from '../data/articles';
 
@@ -43,17 +43,23 @@ const TypingPractice: React.FC = () => {
       <Typography variant="h6" gutterBottom>
         {articles[currentArticleIndex].title}
       </Typography>
-      <Typography variant="body1" sx={{ mb: 2, fontSize: '1.2rem' }}>
-        {text.split('').map((char, index) => (
-          <span key={index} style={{ color: index < currentIndex ? 'green' : index === currentIndex ? 'blue' : 'black' }}>
-            {char}
-          </span>
-        ))}
-      </Typography>
-      <Keyboard onKeyPress={handleKeyPress} currentKey={currentKey} />
-      <Button variant="contained" onClick={handleNextArticle} sx={{ mt: 2 }}>
-        下一篇文章
-      </Button>
+      <Container maxWidth="md" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ width: '100%', maxWidth: 800 }}>  {/* 调整这个宽度以匹配键盘容器 */}
+          <Box sx={{ mb: 2, height: 150, overflowY: 'auto' }}>  {/* 添加固定高度和滚动 */}
+            <Typography variant="body1" sx={{ fontSize: '1.2rem', textAlign: 'left' }}>
+              {text.split('').map((char, index) => (
+                <span key={index} style={{ color: index < currentIndex ? 'green' : index === currentIndex ? 'blue' : 'black' }}>
+                  {char}
+                </span>
+              ))}
+            </Typography>
+          </Box>
+          <Keyboard onKeyPress={handleKeyPress} currentKey={currentKey} />
+          <Button variant="contained" onClick={handleNextArticle} sx={{ mt: 2 }}>
+            下一篇文章
+          </Button>
+        </Box>
+      </Container>
     </Box>
   );
 };
