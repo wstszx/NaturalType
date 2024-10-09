@@ -33,6 +33,7 @@ const TypingPractice: React.FC = () => {
 
   useEffect(() => {
     renderCount.current += 1;
+    console.log('Current key:', currentKey); // 添加这行来调试
   });
 
   return (
@@ -44,8 +45,8 @@ const TypingPractice: React.FC = () => {
         {articles[currentArticleIndex].title}
       </Typography>
       <Container maxWidth="md" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Box sx={{ width: '100%', maxWidth: 800 }}>  {/* 调整这个宽度以匹配键盘容器 */}
-          <Box sx={{ mb: 2, height: 150, overflowY: 'auto' }}>  {/* 添加固定高度和滚动 */}
+        <Box sx={{ width: '100%', maxWidth: 800 }}>
+          <Box sx={{ mb: 2, height: 150, overflowY: 'auto' }}>
             <Typography variant="body1" sx={{ fontSize: '1.2rem', textAlign: 'left' }}>
               {text.split('').map((char, index) => (
                 <span key={index} style={{ color: index < currentIndex ? 'green' : index === currentIndex ? 'blue' : 'black' }}>
