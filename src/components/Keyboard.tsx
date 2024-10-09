@@ -105,9 +105,15 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
     console.log('Keyboard render count:', renderCount.current);
   });
 
+  useEffect(() => {
+    console.log('Current key updated:', currentKey);
+  }, [currentKey]);
+
   const getKeyStyle = useCallback((key: string): SxProps<Theme> => {
     const isHighlighted = key.toLowerCase() === currentKey.toLowerCase();
     const keyPosition = getKeyPosition(key);
+    
+    console.log(`Checking key: ${key}, currentKey: ${currentKey}, isHighlighted: ${isHighlighted}`);
     
     const baseStyle: SxProps<Theme> = {
       minWidth: 40,
@@ -170,6 +176,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
     }
 
     if (isHighlighted) {
+      console.log(`Highlighting key: ${key}`); // 添加高亮日志
       style = {
         ...style,
         backgroundColor: '#FFA726', // 使用更明显的颜色

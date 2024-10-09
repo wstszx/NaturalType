@@ -3,6 +3,15 @@ interface ShuangpinKey {
   yunmu?: string;
 }
 
+export const shuangpinMap: { [key: string]: { shengmu: string; yunmu: string } } = {
+  // 这里应该包含所有的双拼映射
+  // 例如：
+  // '啊': 'aa',
+  // '爱': 'ai',
+  // ... 其他映射
+  '中': { shengmu: 'zh', yunmu: 'ong' },
+};
+
 export const shuangpinData: { [key: string]: ShuangpinKey } = {
   'q': { shengmu: 'q', yunmu: 'iu' },
   'w': { shengmu: 'w', yunmu: 'ia' },
