@@ -1,46 +1,47 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import Keyboard from './Keyboard';
+import { articles } from '../data/articles';
 
 const TypingPractice: React.FC = () => {
-  console.log('TypingPractice component function called');
-
-  const [text, setText] = useState<string>('Hello, world!'); // 示例文本
+  const [currentArticleIndex, setCurrentArticleIndex] = useState<number>(0);
+  const [text, setText] = useState<string>(articles[0].content);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [currentKey, setCurrentKey] = useState<string>(text[0]);
   const renderCount = useRef(0);
 
   const handleKeyPress = useCallback((key: string) => {
-    console.log('handleKeyPress called with key:', key);
     if (key.toLowerCase() === text[currentIndex].toLowerCase()) {
       if (currentIndex < text.length - 1) {
-        setCurrentIndex(prevIndex => {
-          console.log('Updating currentIndex from', prevIndex, 'to', prevIndex + 1);
-          return prevIndex + 1;
-        });
+        setCurrentIndex(prevIndex => prevIndex + 1);
       } else {
-        console.log('练习完成！重置 currentIndex');
         setCurrentIndex(0);
       }
     }
   }, [currentIndex, text]);
 
+  const handleNextArticle = () => {
+    const nextIndex = (currentArticleIndex + 1) % articles.length;
+    setCurrentArticleIndex(nextIndex);
+    setText(articles[nextIndex].content);
+    setCurrentIndex(0);
+  };
+
   useEffect(() => {
-    console.log('Effect: updating currentKey. currentIndex:', currentIndex);
     setCurrentKey(text[currentIndex]);
   }, [currentIndex, text]);
 
   useEffect(() => {
     renderCount.current += 1;
-    console.log('Render count:', renderCount.current);
   });
-
-  console.log('Rendering TypingPractice. currentIndex:', currentIndex, 'currentKey:', currentKey);
 
   return (
     <Box sx={{ textAlign: 'center', p: 2 }}>
       <Typography variant="h4" gutterBottom>
         打字练习
+      </Typography>
+      <Typography variant="h6" gutterBottom>
+        {articles[currentArticleIndex].title}
       </Typography>
       <Typography variant="body1" sx={{ mb: 2, fontSize: '1.2rem' }}>
         {text.split('').map((char, index) => (
@@ -50,6 +51,9 @@ const TypingPractice: React.FC = () => {
         ))}
       </Typography>
       <Keyboard onKeyPress={handleKeyPress} currentKey={currentKey} />
+      <Button variant="contained" onClick={handleNextArticle} sx={{ mt: 2 }}>
+        下一篇文章
+      </Button>
     </Box>
   );
 };
