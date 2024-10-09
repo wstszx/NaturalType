@@ -208,11 +208,9 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
     const lowerKey = key.toLowerCase();
     if (shuangpinData[lowerKey]) {
       const { shengmu, yunmu } = shuangpinData[lowerKey];
-      const shengmuLabel = shengmu || '';
-      const yunmuLabel = Array.isArray(yunmu) ? yunmu.join('/') : yunmu || '';
-      return `${shengmuLabel}${shengmuLabel && yunmuLabel ? ' ' : ''}${yunmuLabel}`.trim();
+      return { shengmu: shengmu || '', yunmu: Array.isArray(yunmu) ? yunmu.join('/') : yunmu || '' };
     }
-    return '';
+    return { shengmu: '', yunmu: '' };
   };
 
   return (
@@ -229,35 +227,44 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
       }}>
         {keys.map((row, rowIndex) => (
           <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
-            {row.map((key) => (
-              <Grid item key={key}>
-                <Button
-                  variant="contained"
-                  onMouseDown={() => {
-                    setPressedKey(key);
-                    onKeyPress(key);
-                    triggerRippleEffect(key);
-                  }}
-                  onMouseUp={() => setPressedKey(null)}
-                  onMouseLeave={() => setPressedKey(null)}
-                  sx={{
-                    ...getKeyStyle(key),
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    lineHeight: 1,
-                  }}
-                >
-                  <Typography variant="body2" component="div">
-                    {getKeyLabel(key)}
-                  </Typography>
-                  <Typography variant="caption" component="div" sx={{ fontSize: '0.6rem', opacity: 0.7 }}>
-                    {getShuangpinLabel(key)}
-                  </Typography>
-                </Button>
-              </Grid>
-            ))}
+            {row.map((key) => {
+              const { shengmu, yunmu } = getShuangpinLabel(key);
+              return (
+                <Grid item key={key}>
+                  <Button
+                    variant="contained"
+                    onMouseDown={() => {
+                      setPressedKey(key);
+                      onKeyPress(key);
+                      triggerRippleEffect(key);
+                    }}
+                    onMouseUp={() => setPressedKey(null)}
+                    onMouseLeave={() => setPressedKey(null)}
+                    sx={{
+                      ...getKeyStyle(key),
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      lineHeight: 1,
+                      height: 50, // Increase height to accommodate more content
+                    }}
+                  >
+                    <Typography variant="body2" component="div" sx={{ fontWeight: 'bold' }}>
+                      {getKeyLabel(key)}
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                      <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
+                        {shengmu}
+                      </Typography>
+                      <Typography variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
+                        {yunmu}
+                      </Typography>
+                    </Box>
+                  </Button>
+                </Grid>
+              );
+            })}
           </Grid>
         ))}
       </Box>
