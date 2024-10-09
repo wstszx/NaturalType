@@ -1,29 +1,20 @@
 interface ShuangpinKey {
   shengmu?: string;
-  yunmu?: string;
+  yunmu?: string | string[];
 }
-
-export const shuangpinMap: { [key: string]: { shengmu: string; yunmu: string } } = {
-  // 这里应该包含所有的双拼映射
-  // 例如：
-  // '啊': 'aa',
-  // '爱': 'ai',
-  // ... 其他映射
-  '中': { shengmu: 'zh', yunmu: 'ong' },
-};
 
 export const shuangpinData: { [key: string]: ShuangpinKey } = {
   'q': { shengmu: 'q', yunmu: 'iu' },
   'w': { shengmu: 'w', yunmu: 'ia' },
-  'e': { shengmu: '', yunmu: 'e' },
+  'e': { shengmu: '', yunmu: ['e', 'ue'] },
   'r': { shengmu: 'r', yunmu: 'uan' },
-  't': { shengmu: 't', yunmu: 'ue' },
+  't': { shengmu: 't', yunmu: 've' },
   'y': { shengmu: 'y', yunmu: 'uai' },
-  'u': { shengmu: 'sh', yunmu: 'u' },
-  'i': { shengmu: 'ch', yunmu: 'i' },
-  'o': { shengmu: '', yunmu: 'o' },
+  'u': { shengmu: 'sh', yunmu: ['u', 'un'] },
+  'i': { shengmu: 'ch', yunmu: ['i', 'in', 'ing'] },
+  'o': { shengmu: '', yunmu: ['o', 'uo'] },
   'p': { shengmu: 'p', yunmu: 'un' },
-  'a': { shengmu: '', yunmu: 'a' },
+  'a': { shengmu: '', yunmu: ['a', 'ia'] },
   's': { shengmu: 's', yunmu: 'ong' },
   'd': { shengmu: 'd', yunmu: 'uang' },
   'f': { shengmu: 'f', yunmu: 'en' },
@@ -35,8 +26,8 @@ export const shuangpinData: { [key: string]: ShuangpinKey } = {
   'z': { shengmu: 'z', yunmu: 'ei' },
   'x': { shengmu: 'x', yunmu: 'ie' },
   'c': { shengmu: 'c', yunmu: 'iao' },
-  'v': { shengmu: 'zh', yunmu: 'ui' },
+  'v': { shengmu: 'zh', yunmu: ['ui', 'v'] },
   'b': { shengmu: 'b', yunmu: 'ou' },
-  'n': { shengmu: 'n', yunmu: 'in' },
+  'n': { shengmu: 'n', yunmu: ['in', 'v'] },
   'm': { shengmu: 'm', yunmu: 'ian' },
 };

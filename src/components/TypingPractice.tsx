@@ -2,27 +2,30 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Typography, Button, Container } from '@mui/material';
 import Keyboard from './Keyboard';
 import { articles } from '../data/articles';
-import { shuangpinMap } from '../data/shuangpinData';
-
-// 在文件顶部添加这个映射
-const shuangpinToKeyMap: { [key: string]: string } = {
-  'zh': 'v',
-  'ch': 'i',
-  'sh': 'u',
-  // 添加更多声母映射
-  // 例如：
-  'b': 'b',
-  'p': 'p',
-  'f': 'f',
-  // ... 其他声母
-  // 对于韵母，通常可以直接使用对应的字母键
-};
+import { shuangpinData } from '../data/shuangpinData';
+import { pinyin } from 'pinyin-pro';
 
 // 修改获取汉字的双拼编码函数
 const getShuangpinCode = (char: string): string[] => {
-  const code = shuangpinMap[char];
-  if (code) {
-    return [code.shengmu || '', code.yunmu || ''];
+  const pinyinResult = pinyin(char, { toneType: 'none', type: 'array' })[0];
+  if (pinyinResult) {
+    let shengmu = pinyinResult.slice(0, pinyinResult.indexOf(pinyinResult.match(/[aeiouv]/i)![0]));
+    let yunmu = pinyinResult.slice(pinyinResult.indexOf(pinyinResult.match(/[aeiouv]/i)![0]));
+
+    // 处理特殊情况
+    if (yunmu === 'ue') yunmu = 've';
+    if (shengmu === '' && ['a', 'e', 'i', 'o', 'u'].includes(yunmu[0])) {
+      shengmu = yunmu[0];
+      yunmu = yunmu.slice(1);
+    }
+
+    const shengmuKey = Object.keys(shuangpinData).find(key => shuangpinData[key].shengmu === shengmu) || '';
+    const yunmuKey = Object.keys(shuangpinData).find(key => {
+      const keyYunmu = shuangpinData[key].yunmu;
+      return Array.isArray(keyYunmu) ? keyYunmu.includes(yunmu) : keyYunmu === yunmu;
+    }) || '';
+
+    return [shengmuKey, yunmuKey];
   }
   console.warn(`No Shuangpin code found for character: ${char}`);
   return ['', ''];
@@ -56,7 +59,7 @@ const TypingPractice: React.FC = () => {
           setCurrentIndex(nextIndex);
           setCurrentKeyIndex(0);
           setCurrentShuangpinCode([nextFirst, nextSecond]);
-          setCurrentKey((shuangpinToKeyMap[nextFirst] || nextFirst).toLowerCase());
+          setCurrentKey(nextFirst.toLowerCase());
         } else {
           console.log('Reached end of text');
           setCurrentIndex(0);
@@ -84,11 +87,9 @@ const TypingPractice: React.FC = () => {
     const [first, second] = getShuangpinCode(currentChar);
     console.log(`Shuangpin code for '${currentChar}': ${first}, ${second}`);
     setCurrentShuangpinCode([first, second]);
-    const newKey = currentKeyIndex === 0 
-      ? (shuangpinToKeyMap[first] || first).toLowerCase()
-      : second.toLowerCase();
+    const newKey = currentKeyIndex === 0 ? first : second;
     console.log(`Setting new current key: ${newKey}`);
-    setCurrentKey(newKey);
+    setCurrentKey(newKey.toLowerCase());
   }, [currentChar, currentKeyIndex]);
 
   useEffect(() => {

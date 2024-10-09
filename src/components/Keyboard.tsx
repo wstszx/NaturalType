@@ -110,7 +110,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
   }, [currentKey]);
 
   const getKeyStyle = useCallback((key: string): SxProps<Theme> => {
-    const isHighlighted = key.toLowerCase() === currentKey.toLowerCase();
+    const isHighlighted = currentKey.toLowerCase().includes(key.toLowerCase());
     const keyPosition = getKeyPosition(key);
     
     console.log(`Checking key: ${key}, currentKey: ${currentKey}, isHighlighted: ${isHighlighted}`);
@@ -207,7 +207,10 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
   const getShuangpinLabel = (key: string) => {
     const lowerKey = key.toLowerCase();
     if (shuangpinData[lowerKey]) {
-      return `${shuangpinData[lowerKey].shengmu || ''} ${shuangpinData[lowerKey].yunmu || ''}`.trim();
+      const { shengmu, yunmu } = shuangpinData[lowerKey];
+      const shengmuLabel = shengmu || '';
+      const yunmuLabel = Array.isArray(yunmu) ? yunmu.join('/') : yunmu || '';
+      return `${shengmuLabel}${shengmuLabel && yunmuLabel ? ' ' : ''}${yunmuLabel}`.trim();
     }
     return '';
   };
