@@ -13,6 +13,11 @@ const isPunctuationOrNonChinese = (char: string): boolean => {
 
 // 修改获取汉字的双拼编码函数
 const getShuangpinCode = (char: string): ShuangpinCode => {
+  // 处理特殊情况：'了'
+  if (char === '了') {
+    return ['l', 'e'] as ShuangpinCode;
+  }
+
   const pinyinResult = pinyin(char, { toneType: 'none', type: 'array' })[0];
   if (pinyinResult) {
     let shengmu = pinyinResult.slice(0, pinyinResult.indexOf(pinyinResult.match(/[aeiouv]/i)![0]));
@@ -42,7 +47,7 @@ type ShuangpinCode = [string, string];
 const TypingPractice: React.FC = () => {
   const [currentArticleIndex, setCurrentArticleIndex] = useState<number>(0);
   const [text, setText] = useState<string>(articles[0].content);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(-1);  // 将初始值设为 -1
   const [currentChar, setCurrentChar] = useState<string>('');
   const [currentShuangpinCode, setCurrentShuangpinCode] = useState<ShuangpinCode>(['', '']);
   const [currentKeyIndex, setCurrentKeyIndex] = useState<number>(0);
@@ -96,7 +101,7 @@ const TypingPractice: React.FC = () => {
     } else {
       console.log('Reached end of text');
       // 可以在这里添加完成练习的逻辑
-      setCurrentIndex(0);
+      setCurrentIndex(-1);  // 将索引重置为 -1
       setCurrentKeyIndex(0);
       setCurrentKey('');
       setTypedKeys([]);
