@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Typography, Button, Container } from '@mui/material';
+import { Box, Typography, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import Keyboard from './Keyboard';
 import { articles } from '../data/articles';
 import { shuangpinData } from '../data/shuangpinData';
@@ -54,6 +54,7 @@ const TypingPractice: React.FC = () => {
   const [currentKey, setCurrentKey] = useState<string>('');
   const [typedKeys, setTypedKeys] = useState<string[]>([]);
   const renderCount = useRef(0);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleKeyPress = useCallback((key: string) => {
     const lowerCaseKey = key.toLowerCase();
@@ -100,8 +101,8 @@ const TypingPractice: React.FC = () => {
       setTypedKeys([]);
     } else {
       console.log('Reached end of text');
-      // 可以在这里添加完成练习的逻辑
-      setCurrentIndex(-1);  // 将索引重置为 -1
+      setOpenDialog(true); // 打开弹窗
+      setCurrentIndex(-1);
       setCurrentKeyIndex(0);
       setCurrentKey('');
       setTypedKeys([]);
@@ -115,6 +116,7 @@ const TypingPractice: React.FC = () => {
     setCurrentIndex(-1);
     setCurrentKeyIndex(0);
     setTypedKeys([]);
+    setOpenDialog(false); // 关闭弹窗
   };
 
   useEffect(() => {
@@ -174,6 +176,26 @@ const TypingPractice: React.FC = () => {
           </Button>
         </Box>
       </Container>
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"恭喜您完成输入！"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            您已经完成了当前文章的输入。准备好挑战下一篇文章了吗？
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleNextArticle} autoFocus>
+            确认
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
