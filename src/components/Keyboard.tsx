@@ -220,10 +220,10 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
       const { shengmu, yunmu } = scheme[lowerKey];
       return { 
         shengmu: shengmu || '', 
-        yunmu: Array.isArray(yunmu) ? yunmu.join('/') : yunmu || '' 
+        yunmu: Array.isArray(yunmu) ? yunmu : yunmu ? [yunmu] : [] 
       };
     }
-    return { shengmu: '', yunmu: '' };
+    return { shengmu: '', yunmu: [] };
   };
 
   return (
@@ -242,6 +242,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
           <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
             {row.map((key) => {
               const { shengmu, yunmu } = getShuangpinLabel(key);
+              const isLetterKey = /^[a-zA-Z]$/.test(key);
               return (
                 <Grid item key={key} sx={{ flex: 1, display: 'flex' }}>
                   <Button
@@ -258,22 +259,32 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
                       display: 'flex',
                       flexDirection: 'row',
                       alignItems: 'center',
-                      justifyContent: 'flex-start',
+                      justifyContent: isLetterKey ? 'flex-start' : 'center',
                       lineHeight: 1,
-                      width: '100%', // Make button fill the grid item
+                      width: '100%',
                     }}
                   >
-                    <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', marginRight: '4px', fontSize: '0.8rem' }}>
-                      {getKeyLabel(key)}
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
-                        {shengmu}
+                    {isLetterKey ? (
+                      <>
+                        <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', marginRight: '4px', fontSize: '0.8rem' }}>
+                          {getKeyLabel(key)}
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                          <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
+                            {shengmu}
+                          </Typography>
+                          {yunmu.map((ym, index) => (
+                            <Typography key={index} variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
+                              {ym}
+                            </Typography>
+                          ))}
+                        </Box>
+                      </>
+                    ) : (
+                      <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', fontSize: '0.8rem' }}>
+                        {getKeyLabel(key)}
                       </Typography>
-                      <Typography variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
-                        {yunmu}
-                      </Typography>
-                    </Box>
+                    )}
                   </Button>
                 </Grid>
               );
