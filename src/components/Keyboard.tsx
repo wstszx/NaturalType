@@ -114,18 +114,16 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
     const isHighlighted = currentKey.toLowerCase().includes(key.toLowerCase());
     const keyPosition = getKeyPosition(key);
     
-    console.log(`Checking key: ${key}, currentKey: ${currentKey}, isHighlighted: ${isHighlighted}`);
-    
     const baseStyle: SxProps<Theme> = {
-      minWidth: 40,
+      minWidth: 30, // Reduce minimum width
       height: 40,
-      padding: '4px',
-      fontSize: '0.8rem',
+      padding: '2px', // Reduce padding
+      fontSize: '0.7rem', // Slightly reduce font size
       fontWeight: 'bold',
       transition: 'all 0.1s ease',
       position: 'relative',
-      overflow: 'visible',
-      border: '2px solid #6750A4',
+      overflow: 'hidden', // Change to hidden to prevent content overflow
+      border: '1px solid #6750A4', // Reduce border width
       borderRadius: '4px',
       backgroundColor: isHighlighted ? '#E8DEF8' : '#EADDFF',
       color: '#1C1B1F',
@@ -147,10 +145,10 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
       case 'Enter':
       case 'ShiftLeft':
       case 'ShiftRight':
-        (style as any).minWidth = 70;
+        (style as any).minWidth = 60; // Reduce width for these keys
         break;
       case 'Space':
-        (style as any).minWidth = 240;
+        (style as any).minWidth = 180; // Reduce width for space bar
         break;
     }
 
@@ -221,16 +219,17 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
     <ErrorBoundary>
       <Box sx={{ 
         mt: 2, 
-        p: 2, 
+        p: 1, // Reduce padding
         borderRadius: '10px',
         backgroundColor: '#F3EDF7',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
         width: '100%',
-        maxWidth: '900px',
+        maxWidth: '1000px', // Increase max width
         margin: '0 auto',
+        overflowX: 'auto', // Add horizontal scroll if needed
       }}>
         {keys.map((row, rowIndex) => (
-          <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
+          <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5, flexWrap: 'nowrap' }}>
             {row.map((key) => {
               const { shengmu, yunmu } = getShuangpinLabel(key);
               return (
@@ -247,21 +246,22 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
                     sx={{
                       ...getKeyStyle(key),
                       display: 'flex',
-                      flexDirection: 'column',
+                      flexDirection: 'row',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
+                      justifyContent: 'flex-start',
                       lineHeight: 1,
-                      height: 50, // Increase height to accommodate more content
+                      height: 40, // Reduce height
+                      padding: '2px 4px', // Reduce padding
                     }}
                   >
-                    <Typography variant="body2" component="div" sx={{ fontWeight: 'bold' }}>
+                    <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', marginRight: '4px', fontSize: '0.7rem' }}>
                       {getKeyLabel(key)}
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                      <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                      <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.5rem' }}>
                         {shengmu}
                       </Typography>
-                      <Typography variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
+                      <Typography variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.5rem' }}>
                         {yunmu}
                       </Typography>
                     </Box>
