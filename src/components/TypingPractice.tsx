@@ -205,25 +205,31 @@ const TypingPractice: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         打字练习
       </Typography>
-      <Typography variant="h6" gutterBottom>
-        {articles[currentArticleIndex].title}
-      </Typography>
-      <FormControl sx={{ m: 1, minWidth: 120 }}>
-        <InputLabel id="scheme-select-label">双拼方案</InputLabel>
-        <Select
-          labelId="scheme-select-label"
-          id="scheme-select"
-          value={currentScheme}
-          label="双拼方案"
-          onChange={handleSchemeChange}
-        >
-          {Object.keys(shuangpinSchemes).map((schemeName) => (
-            <MenuItem key={schemeName} value={schemeName}>
-              {schemeName}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Grid container spacing={2} alignItems="center" justifyContent="center" sx={{ mb: 2 }}>
+        <Grid item>
+          <Typography variant="h6">
+            {articles[currentArticleIndex].title}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel id="scheme-select-label">双拼方案</InputLabel>
+            <Select
+              labelId="scheme-select-label"
+              id="scheme-select"
+              value={currentScheme}
+              label="双拼方案"
+              onChange={handleSchemeChange}
+            >
+              {Object.keys(shuangpinSchemes).map((schemeName) => (
+                <MenuItem key={schemeName} value={schemeName}>
+                  {schemeName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
       <Container maxWidth="md" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ width: '100%', maxWidth: 800 }}>
           <Box sx={{ mb: 2, height: 150, overflowY: 'auto' }}>
