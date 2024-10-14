@@ -11,16 +11,20 @@ const isPunctuationOrNonChinese = (char: string): boolean => {
   return regex.test(char);
 };
 
-// 修改获取汉字的双拼编码函数
-const getShuangpinCode = (char: string): ShuangpinCode => {
-  const pinyinResult = pinyin(char, { toneType: 'none', type: 'array' })[0];
-  if (pinyinResult) {
-    const firstVowelIndex = pinyinResult.search(/[aeiouv]/i);
-    let shengmu = pinyinResult.slice(0, firstVowelIndex);
-    let yunmu = pinyinResult.slice(firstVowelIndex);
+// 新增：获取整篇文章拼音的函数
+const getArticlePinyin = (text: string): string[] => {
+  return pinyin(text, { toneType: 'none', type: 'array' });
+};
+
+// 修改：getShuangpinCode 函数现在接受预先计算的拼音
+const getShuangpinCode = (char: string, pinyinStr: string): ShuangpinCode => {
+  if (pinyinStr) {
+    const firstVowelIndex = pinyinStr.search(/[aeiouv]/i);
+    let shengmu = pinyinStr.slice(0, firstVowelIndex);
+    let yunmu = pinyinStr.slice(firstVowelIndex);
 
     console.log(`Character: ${char}`);
-    console.log(`Full Pinyin: ${pinyinResult}`);
+    console.log(`Full Pinyin: ${pinyinStr}`);
     console.log(`Initial Shengmu: ${shengmu || '(zero initial)'}`);
     console.log(`Initial Yunmu: ${yunmu}`);
 
@@ -69,6 +73,7 @@ const TypingPractice: React.FC = () => {
   const renderCount = useRef(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [openDonateDialog, setOpenDonateDialog] = useState(false);
+  const [articlePinyin, setArticlePinyin] = useState<string[]>([]);
 
   const handleKeyPress = useCallback((key: string) => {
     const lowerCaseKey = key.toLowerCase();
@@ -92,6 +97,14 @@ const TypingPractice: React.FC = () => {
     }
   }, [currentKey, currentShuangpinCode, typedKeys]);
 
+  // 修改：在文章加载时获取整篇文章的拼音
+  useEffect(() => {
+    const pinyinArray = getArticlePinyin(text);
+    setArticlePinyin(pinyinArray);
+    console.log('Article pinyin:', pinyinArray);
+  }, [text]);
+
+  // 修改：moveToNextCharacter 函数现在使用预先计算的拼音
   const moveToNextCharacter = useCallback(() => {
     let nextIndex = currentIndex + 1;
     let nextChar = text[nextIndex];
@@ -103,10 +116,10 @@ const TypingPractice: React.FC = () => {
     }
 
     if (nextIndex < text.length) {
-      const nextShuangpinCode = getShuangpinCode(nextChar);
+      const nextPinyin = articlePinyin[nextIndex];
+      const nextShuangpinCode = getShuangpinCode(nextChar, nextPinyin);
       
-      console.log(`Moving to next character: ${nextChar}`);
-      // getShuangpinCode 函数中的日志会打印出详细的拼音构成信息
+      console.log(`Moving to next character: ${nextChar}, Pinyin: ${nextPinyin}`);
       
       setCurrentIndex(nextIndex);
       setCurrentChar(nextChar);
@@ -122,16 +135,19 @@ const TypingPractice: React.FC = () => {
       setCurrentKey('');
       setTypedKeys([]);
     }
-  }, [currentIndex, text]);
+  }, [currentIndex, text, articlePinyin]);
 
+  // 修改：handleNextArticle 函数需要重置 articlePinyin
   const handleNextArticle = () => {
     const nextIndex = (currentArticleIndex + 1) % articles.length;
+    const nextText = articles[nextIndex].content;
     setCurrentArticleIndex(nextIndex);
-    setText(articles[nextIndex].content);
+    setText(nextText);
+    setArticlePinyin(getArticlePinyin(nextText));
     setCurrentIndex(-1);
     setCurrentKeyIndex(0);
     setTypedKeys([]);
-    setOpenDialog(false); // 关闭弹窗
+    setOpenDialog(false);
   };
 
   const handleOpenDonateDialog = () => {
@@ -150,14 +166,14 @@ const TypingPractice: React.FC = () => {
 
   useEffect(() => {
     if (currentChar) {
-      const shuangpinCode = getShuangpinCode(currentChar);
+      const shuangpinCode = getShuangpinCode(currentChar, articlePinyin[currentIndex]);
       console.log(`Shuangpin code for '${currentChar}': ${shuangpinCode[0]}, ${shuangpinCode[1]}`);
       setCurrentShuangpinCode(shuangpinCode);
       const newKey = currentKeyIndex === 0 ? shuangpinCode[0] : shuangpinCode[1];
       console.log(`Setting new current key: ${newKey}`);
       setCurrentKey(newKey.toLowerCase());
     }
-  }, [currentChar, currentKeyIndex]);
+  }, [currentChar, currentKeyIndex, articlePinyin, currentIndex]);
 
   useEffect(() => {
     renderCount.current += 1;
@@ -166,8 +182,10 @@ const TypingPractice: React.FC = () => {
     console.log('Current Key:', currentKey);
   });
 
-  // 初始化
+  // 修改：初始化时也需要设置 articlePinyin
   useEffect(() => {
+    const initialPinyin = getArticlePinyin(text);
+    setArticlePinyin(initialPinyin);
     moveToNextCharacter();
   }, []);
 
