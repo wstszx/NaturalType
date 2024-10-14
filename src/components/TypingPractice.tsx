@@ -13,21 +13,32 @@ const isPunctuationOrNonChinese = (char: string): boolean => {
 
 // 修改获取汉字的双拼编码函数
 const getShuangpinCode = (char: string): ShuangpinCode => {
-  // 处理特殊情况：'了'
-  if (char === '了') {
-    return ['l', 'e'] as ShuangpinCode;
-  }
-
   const pinyinResult = pinyin(char, { toneType: 'none', type: 'array' })[0];
   if (pinyinResult) {
-    let shengmu = pinyinResult.slice(0, pinyinResult.indexOf(pinyinResult.match(/[aeiouv]/i)![0]));
-    let yunmu = pinyinResult.slice(pinyinResult.indexOf(pinyinResult.match(/[aeiouv]/i)![0]));
+    const firstVowelIndex = pinyinResult.search(/[aeiouv]/i);
+    let shengmu = pinyinResult.slice(0, firstVowelIndex);
+    let yunmu = pinyinResult.slice(firstVowelIndex);
 
-    // 处理特殊情况
+    console.log(`Character: ${char}`);
+    console.log(`Full Pinyin: ${pinyinResult}`);
+    console.log(`Initial Shengmu: ${shengmu || '(zero initial)'}`);
+    console.log(`Initial Yunmu: ${yunmu}`);
+
+    // 处理特殊韵母
     if (yunmu === 'ue') yunmu = 've';
+
+    // 处理零声母情况
     if (shengmu === '' && ['a', 'e', 'i', 'o', 'u'].includes(yunmu[0])) {
       shengmu = yunmu[0];
       yunmu = yunmu.slice(1);
+      console.log(`Zero initial case - Updated Shengmu: ${shengmu}, Updated Yunmu: ${yunmu}`);
+    }
+
+    // 处理单韵母情况（如"啊"、"饿"、"哦"等）
+    if (shengmu === '' && yunmu.length === 1) {
+      shengmu = yunmu;
+      yunmu = 'iuv'.includes(yunmu) ? 'i' : yunmu;
+      console.log(`Single vowel case - Updated Shengmu: ${shengmu}, Updated Yunmu: ${yunmu}`);
     }
 
     const shengmuKey = Object.keys(shuangpinData).find(key => shuangpinData[key].shengmu === shengmu) || '';
@@ -35,6 +46,8 @@ const getShuangpinCode = (char: string): ShuangpinCode => {
       const keyYunmu = shuangpinData[key].yunmu;
       return Array.isArray(keyYunmu) ? keyYunmu.includes(yunmu) : keyYunmu === yunmu;
     }) || '';
+
+    console.log(`Final Shuangpin code: Shengmu Key: ${shengmuKey}, Yunmu Key: ${yunmuKey}`);
 
     return [shengmuKey, yunmuKey] as ShuangpinCode;
   }
@@ -91,7 +104,8 @@ const TypingPractice: React.FC = () => {
     if (nextIndex < text.length) {
       const nextShuangpinCode = getShuangpinCode(nextChar);
       
-      console.log(`Moving to next character: ${nextChar}, Shuangpin: ${nextShuangpinCode.join(', ')}`);
+      console.log(`Moving to next character: ${nextChar}`);
+      // getShuangpinCode 函数中的日志会打印出详细的拼音构成信息
       
       setCurrentIndex(nextIndex);
       setCurrentChar(nextChar);
