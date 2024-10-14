@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { SxProps, Theme } from '@mui/system';
-import { shuangpinData } from '../data/shuangpinData'; // 导入双拼数据
+import { ShuangpinScheme } from '../data/shuangpinSchemes';
 
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
-  currentKey: string; // 新增：当前需要点击的按键
+  currentKey: string;
+  scheme: ShuangpinScheme;
 }
 
 const keys = [
@@ -54,7 +55,7 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
   }
 }
 
-const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
+const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) => {
   console.log('Rendering Keyboard. currentKey:', currentKey);
 
   const [pressedKey, setPressedKey] = useState<string | null>(null);
@@ -206,9 +207,12 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey }) => {
 
   const getShuangpinLabel = (key: string) => {
     const lowerKey = key.toLowerCase();
-    if (shuangpinData[lowerKey]) {
-      const { shengmu, yunmu } = shuangpinData[lowerKey];
-      return { shengmu: shengmu || '', yunmu: Array.isArray(yunmu) ? yunmu.join('/') : yunmu || '' };
+    if (scheme[lowerKey]) {
+      const { shengmu, yunmu } = scheme[lowerKey];
+      return { 
+        shengmu: shengmu || '', 
+        yunmu: Array.isArray(yunmu) ? yunmu.join('/') : yunmu || '' 
+      };
     }
     return { shengmu: '', yunmu: '' };
   };

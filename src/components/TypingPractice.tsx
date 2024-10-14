@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Typography, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid } from '@mui/material';
+import { Box, Typography, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import Keyboard from './Keyboard';
 import { articles } from '../data/articles';
-import { shuangpinData } from '../data/shuangpinData';
+import { shuangpinSchemes, ShuangpinSchemeName } from '../data/shuangpinSchemes';
 import { pinyin } from 'pinyin-pro';
+import { SelectChangeEvent } from '@mui/material/Select';
 
 // 检查字符是否为标点符号或非汉字的函数
 const isPunctuationOrNonChinese = (char: string): boolean => {
@@ -17,7 +18,7 @@ const getArticlePinyin = (text: string): string[] => {
 };
 
 // 修改：getShuangpinCode 函数现在接受预先计算的拼音
-const getShuangpinCode = (char: string, pinyinStr: string): ShuangpinCode => {
+const getShuangpinCode = (char: string, pinyinStr: string, currentScheme: ShuangpinSchemeName): ShuangpinCode => {
   if (pinyinStr) {
     const firstVowelIndex = pinyinStr.search(/[aeiouv]/i);
     let shengmu = pinyinStr.slice(0, firstVowelIndex);
@@ -45,9 +46,10 @@ const getShuangpinCode = (char: string, pinyinStr: string): ShuangpinCode => {
       console.log(`Single vowel case - Updated Shengmu: ${shengmu}, Updated Yunmu: ${yunmu}`);
     }
 
-    const shengmuKey = Object.keys(shuangpinData).find(key => shuangpinData[key].shengmu === shengmu) || '';
-    const yunmuKey = Object.keys(shuangpinData).find(key => {
-      const keyYunmu = shuangpinData[key].yunmu;
+    const currentSchemeData = shuangpinSchemes[currentScheme];
+    const shengmuKey = Object.keys(currentSchemeData).find(key => currentSchemeData[key].shengmu === shengmu) || '';
+    const yunmuKey = Object.keys(currentSchemeData).find(key => {
+      const keyYunmu = currentSchemeData[key].yunmu;
       return Array.isArray(keyYunmu) ? keyYunmu.includes(yunmu) : keyYunmu === yunmu;
     }) || '';
 
@@ -74,6 +76,7 @@ const TypingPractice: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openDonateDialog, setOpenDonateDialog] = useState(false);
   const [articlePinyin, setArticlePinyin] = useState<string[]>([]);
+  const [currentScheme, setCurrentScheme] = useState<ShuangpinSchemeName>("微软双拼");
 
   const handleKeyPress = useCallback((key: string) => {
     const lowerCaseKey = key.toLowerCase();
@@ -117,7 +120,7 @@ const TypingPractice: React.FC = () => {
 
     if (nextIndex < text.length) {
       const nextPinyin = articlePinyin[nextIndex];
-      const nextShuangpinCode = getShuangpinCode(nextChar, nextPinyin);
+      const nextShuangpinCode = getShuangpinCode(nextChar, nextPinyin, currentScheme);
       
       console.log(`Moving to next character: ${nextChar}, Pinyin: ${nextPinyin}`);
       
@@ -135,7 +138,7 @@ const TypingPractice: React.FC = () => {
       setCurrentKey('');
       setTypedKeys([]);
     }
-  }, [currentIndex, text, articlePinyin]);
+  }, [currentIndex, text, articlePinyin, currentScheme]);
 
   // 修改：handleNextArticle 函数需要重置 articlePinyin
   const handleNextArticle = () => {
@@ -166,14 +169,14 @@ const TypingPractice: React.FC = () => {
 
   useEffect(() => {
     if (currentChar) {
-      const shuangpinCode = getShuangpinCode(currentChar, articlePinyin[currentIndex]);
+      const shuangpinCode = getShuangpinCode(currentChar, articlePinyin[currentIndex], currentScheme);
       console.log(`Shuangpin code for '${currentChar}': ${shuangpinCode[0]}, ${shuangpinCode[1]}`);
       setCurrentShuangpinCode(shuangpinCode);
       const newKey = currentKeyIndex === 0 ? shuangpinCode[0] : shuangpinCode[1];
       console.log(`Setting new current key: ${newKey}`);
       setCurrentKey(newKey.toLowerCase());
     }
-  }, [currentChar, currentKeyIndex, articlePinyin, currentIndex]);
+  }, [currentChar, currentKeyIndex, articlePinyin, currentIndex, currentScheme]);
 
   useEffect(() => {
     renderCount.current += 1;
@@ -189,6 +192,14 @@ const TypingPractice: React.FC = () => {
     moveToNextCharacter();
   }, []);
 
+  const handleSchemeChange = (event: SelectChangeEvent<ShuangpinSchemeName>) => {
+    setCurrentScheme(event.target.value as ShuangpinSchemeName);
+    // Reset current practice state
+    setCurrentIndex(-1);
+    setCurrentKeyIndex(0);
+    setTypedKeys([]);
+  };
+
   return (
     <Box sx={{ textAlign: 'center', p: 2 }}>
       <Typography variant="h4" gutterBottom>
@@ -197,6 +208,22 @@ const TypingPractice: React.FC = () => {
       <Typography variant="h6" gutterBottom>
         {articles[currentArticleIndex].title}
       </Typography>
+      <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <InputLabel id="scheme-select-label">双拼方案</InputLabel>
+        <Select
+          labelId="scheme-select-label"
+          id="scheme-select"
+          value={currentScheme}
+          label="双拼方案"
+          onChange={handleSchemeChange}
+        >
+          {Object.keys(shuangpinSchemes).map((schemeName) => (
+            <MenuItem key={schemeName} value={schemeName}>
+              {schemeName}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <Container maxWidth="md" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ width: '100%', maxWidth: 800 }}>
           <Box sx={{ mb: 2, height: 150, overflowY: 'auto' }}>
@@ -210,7 +237,8 @@ const TypingPractice: React.FC = () => {
           </Box>
           <Keyboard 
             onKeyPress={handleKeyPress} 
-            currentKey={currentKey} 
+            currentKey={currentKey}
+            scheme={shuangpinSchemes[currentScheme]}
           />
           <Box sx={{ mt: 2 }}>
             <Button variant="contained" onClick={handleNextArticle} sx={{ mr: 2 }}>
