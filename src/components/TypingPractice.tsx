@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Typography, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Box, Typography, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid } from '@mui/material';
 import Keyboard from './Keyboard';
 import { articles } from '../data/articles';
 import { shuangpinData } from '../data/shuangpinData';
@@ -68,6 +68,7 @@ const TypingPractice: React.FC = () => {
   const [typedKeys, setTypedKeys] = useState<string[]>([]);
   const renderCount = useRef(0);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDonateDialog, setOpenDonateDialog] = useState(false);
 
   const handleKeyPress = useCallback((key: string) => {
     const lowerCaseKey = key.toLowerCase();
@@ -133,6 +134,14 @@ const TypingPractice: React.FC = () => {
     setOpenDialog(false); // 关闭弹窗
   };
 
+  const handleOpenDonateDialog = () => {
+    setOpenDonateDialog(true);
+  };
+
+  const handleCloseDonateDialog = () => {
+    setOpenDonateDialog(false);
+  };
+
   useEffect(() => {
     if (currentIndex === -1) {
       moveToNextCharacter();
@@ -185,9 +194,14 @@ const TypingPractice: React.FC = () => {
             onKeyPress={handleKeyPress} 
             currentKey={currentKey} 
           />
-          <Button variant="contained" onClick={handleNextArticle} sx={{ mt: 2 }}>
-            下一篇文章
-          </Button>
+          <Box sx={{ mt: 2 }}>
+            <Button variant="contained" onClick={handleNextArticle} sx={{ mr: 2 }}>
+              下一篇文章
+            </Button>
+            <Button variant="outlined" onClick={handleOpenDonateDialog}>
+              捐赠支持
+            </Button>
+          </Box>
         </Box>
       </Container>
       <Dialog
@@ -208,6 +222,34 @@ const TypingPractice: React.FC = () => {
           <Button onClick={handleNextArticle} autoFocus>
             确认
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openDonateDialog}
+        onClose={handleCloseDonateDialog}
+        aria-labelledby="donate-dialog-title"
+        aria-describedby="donate-dialog-description"
+      >
+        <DialogTitle id="donate-dialog-title">
+          {"感谢您的支持！"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="donate-dialog-description">
+            如果您觉得这个工具对您有帮助，可以考虑给我们一些支持。您可以通过以下方式进行捐赠：
+          </DialogContentText>
+          <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1" gutterBottom>微信支付</Typography>
+              <img src="/images/wechat_qr.png" alt="微信收款码" style={{ width: '100%', maxWidth: 200 }} />
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1" gutterBottom>支付宝</Typography>
+              <img src="/images/alipay_qr.png" alt="支付宝收款码" style={{ width: '100%', maxWidth: 200 }} />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDonateDialog}>关闭</Button>
         </DialogActions>
       </Dialog>
     </Box>
