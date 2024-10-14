@@ -115,15 +115,15 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
     const keyPosition = getKeyPosition(key);
     
     const baseStyle: SxProps<Theme> = {
-      minWidth: 30, // Reduce minimum width
-      height: 40,
-      padding: '2px', // Reduce padding
-      fontSize: '0.7rem', // Slightly reduce font size
+      minWidth: 40, // Increase minimum width
+      height: 50, // Increase height
+      padding: '4px', // Increase padding
+      fontSize: '0.8rem', // Increase font size
       fontWeight: 'bold',
       transition: 'all 0.1s ease',
       position: 'relative',
-      overflow: 'hidden', // Change to hidden to prevent content overflow
-      border: '1px solid #6750A4', // Reduce border width
+      overflow: 'hidden',
+      border: '1px solid #6750A4',
       borderRadius: '4px',
       backgroundColor: isHighlighted ? '#E8DEF8' : '#EADDFF',
       color: '#1C1B1F',
@@ -133,6 +133,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
       transform: 'scale(1)',
       boxShadow: 'none',
       animation: 'none',
+      flex: 1, // Make all keys flex to fill the space
     };
 
     let style: SxProps<Theme> = { ...baseStyle };
@@ -140,15 +141,25 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
     // Adjust width for specific keys
     switch (key) {
       case 'Backspace':
+        (style as any).flex = 1.5;
+        break;
       case 'Tab':
       case 'CapsLock':
       case 'Enter':
       case 'ShiftLeft':
       case 'ShiftRight':
-        (style as any).minWidth = 60; // Reduce width for these keys
+        (style as any).flex = 1.8;
         break;
       case 'Space':
-        (style as any).minWidth = 180; // Reduce width for space bar
+        (style as any).flex = 6;
+        break;
+      case 'CtrlLeft':
+      case 'CtrlRight':
+      case 'Win':
+      case 'AltLeft':
+      case 'AltRight':
+      case 'Fn':
+        (style as any).flex = 1.2;
         break;
     }
 
@@ -219,21 +230,20 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
     <ErrorBoundary>
       <Box sx={{ 
         mt: 2, 
-        p: 1, // Reduce padding
+        p: 1,
         borderRadius: '10px',
         backgroundColor: '#F3EDF7',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
         width: '100%',
-        maxWidth: '1000px', // Increase max width
+        maxWidth: '1100px', // Increase max width
         margin: '0 auto',
-        overflowX: 'auto', // Add horizontal scroll if needed
       }}>
         {keys.map((row, rowIndex) => (
-          <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5, flexWrap: 'nowrap' }}>
+          <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
             {row.map((key) => {
               const { shengmu, yunmu } = getShuangpinLabel(key);
               return (
-                <Grid item key={key}>
+                <Grid item key={key} sx={{ flex: 1, display: 'flex' }}>
                   <Button
                     variant="contained"
                     onMouseDown={() => {
@@ -250,18 +260,17 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
                       alignItems: 'center',
                       justifyContent: 'flex-start',
                       lineHeight: 1,
-                      height: 40, // Reduce height
-                      padding: '2px 4px', // Reduce padding
+                      width: '100%', // Make button fill the grid item
                     }}
                   >
-                    <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', marginRight: '4px', fontSize: '0.7rem' }}>
+                    <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', marginRight: '4px', fontSize: '0.8rem' }}>
                       {getKeyLabel(key)}
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.5rem' }}>
+                      <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
                         {shengmu}
                       </Typography>
-                      <Typography variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.5rem' }}>
+                      <Typography variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
                         {yunmu}
                       </Typography>
                     </Box>
