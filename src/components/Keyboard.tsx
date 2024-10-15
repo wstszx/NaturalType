@@ -110,11 +110,11 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
     console.log('Current key updated:', currentKey);
   }, [currentKey]);
 
-  const getKeyStyle = useCallback((key: string): SxProps<Theme> & { flexGrow: number } => {
+  const getKeyStyle = useCallback((key: string): SxProps<Theme> & { flexGrow: number; width?: string } => {
     const isHighlighted = currentKey.toLowerCase().includes(key.toLowerCase());
     const keyPosition = getKeyPosition(key);
     
-    const baseStyle: SxProps<Theme> & { flexGrow: number } = {
+    const baseStyle: SxProps<Theme> & { flexGrow: number; width?: string } = {
       minWidth: 40,
       height: 50,
       padding: '4px',
@@ -140,41 +140,47 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
       justifyContent: 'center',
     };
 
-    let style: SxProps<Theme> & { flexGrow: number } = { ...baseStyle };
+    let style: SxProps<Theme> & { flexGrow: number; width?: string } = { ...baseStyle };
 
-    // Adjust width for specific keys
-    switch (key) {
-      case 'Backspace':
-        style.flexGrow = 2;
-        break;
-      case 'Tab':
-      case 'CapsLock':
-        style.flexGrow = 1.5;
-        break;
-      case 'Enter':
-        style.flexGrow = 2.25;
-        break;
-      case 'ShiftLeft':
-        style.flexGrow = 2.25;
-        break;
-      case 'ShiftRight':
-        style.flexGrow = 2.75;
-        break;
-      case 'Space':
-        style.flexGrow = 6.25;
-        break;
-      case 'CtrlLeft':
-      case 'CtrlRight':
-      case 'Win':
-      case 'AltLeft':
-      case 'AltRight':
-      case 'Fn':
-        style.flexGrow = 1.25;
-        break;
-      default:
-        if (/^[a-zA-Z]$/.test(key)) {
-          style.flexGrow = 1;
-        }
+    // 为字母键设置固定宽度
+    if (/^[a-zA-Z]$/.test(key)) {
+      style.width = '50px';  // 或者其他适合的固定宽度
+      style.flexGrow = 0;    // 防止 flex 增长
+    } else {
+      // 其他键的 flexGrow 逻辑保持不变
+      switch (key) {
+        case 'Backspace':
+          style.flexGrow = 2;
+          break;
+        case 'Tab':
+        case 'CapsLock':
+          style.flexGrow = 1.5;
+          break;
+        case 'Enter':
+          style.flexGrow = 2.25;
+          break;
+        case 'ShiftLeft':
+          style.flexGrow = 2.25;
+          break;
+        case 'ShiftRight':
+          style.flexGrow = 2.75;
+          break;
+        case 'Space':
+          style.flexGrow = 6.25;
+          break;
+        case 'CtrlLeft':
+        case 'CtrlRight':
+        case 'Win':
+        case 'AltLeft':
+        case 'AltRight':
+        case 'Fn':
+          style.flexGrow = 1.25;
+          break;
+        default:
+          if (/^[a-zA-Z]$/.test(key)) {
+            style.flexGrow = 1;
+          }
+      }
     }
 
     if (key === pressedKey) {
