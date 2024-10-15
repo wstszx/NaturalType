@@ -110,15 +110,15 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
     console.log('Current key updated:', currentKey);
   }, [currentKey]);
 
-  const getKeyStyle = useCallback((key: string): SxProps<Theme> => {
+  const getKeyStyle = useCallback((key: string): SxProps<Theme> & { flexGrow: number } => {
     const isHighlighted = currentKey.toLowerCase().includes(key.toLowerCase());
     const keyPosition = getKeyPosition(key);
     
-    const baseStyle: SxProps<Theme> = {
-      minWidth: 40, // Increase minimum width
-      height: 50, // Increase height
-      padding: '4px', // Increase padding
-      fontSize: '0.8rem', // Increase font size
+    const baseStyle: SxProps<Theme> & { flexGrow: number } = {
+      minWidth: 40,
+      height: 50,
+      padding: '4px',
+      fontSize: '0.8rem',
       fontWeight: 'bold',
       transition: 'all 0.1s ease',
       position: 'relative',
@@ -133,25 +133,35 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
       transform: 'scale(1)',
       boxShadow: 'none',
       animation: 'none',
-      flex: 1, // Make all keys flex to fill the space
+      flexGrow: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
     };
 
-    let style: SxProps<Theme> = { ...baseStyle };
+    let style: SxProps<Theme> & { flexGrow: number } = { ...baseStyle };
 
     // Adjust width for specific keys
     switch (key) {
       case 'Backspace':
-        (style as any).flex = 1.5;
+        style.flexGrow = 2;
         break;
       case 'Tab':
       case 'CapsLock':
+        style.flexGrow = 1.5;
+        break;
       case 'Enter':
+        style.flexGrow = 2.25;
+        break;
       case 'ShiftLeft':
+        style.flexGrow = 2.25;
+        break;
       case 'ShiftRight':
-        (style as any).flex = 1.8;
+        style.flexGrow = 2.75;
         break;
       case 'Space':
-        (style as any).flex = 6;
+        style.flexGrow = 6.25;
         break;
       case 'CtrlLeft':
       case 'CtrlRight':
@@ -159,8 +169,12 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
       case 'AltLeft':
       case 'AltRight':
       case 'Fn':
-        (style as any).flex = 1.2;
+        style.flexGrow = 1.25;
         break;
+      default:
+        if (/^[a-zA-Z]$/.test(key)) {
+          style.flexGrow = 1;
+        }
     }
 
     if (key === pressedKey) {
@@ -235,7 +249,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
         backgroundColor: '#F3EDF7',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
         width: '100%',
-        maxWidth: '1100px', // Increase max width
+        maxWidth: '1000px', // Slightly reduced max width
         margin: '0 auto',
       }}>
         {keys.map((row, rowIndex) => (
@@ -243,8 +257,9 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
             {row.map((key) => {
               const { shengmu, yunmu } = getShuangpinLabel(key);
               const isLetterKey = /^[a-zA-Z]$/.test(key);
+              const keyStyle = getKeyStyle(key);
               return (
-                <Grid item key={key} sx={{ flex: 1, display: 'flex' }}>
+                <Grid item key={key} sx={{ display: 'flex', flexGrow: keyStyle.flexGrow }}>
                   <Button
                     variant="contained"
                     onMouseDown={() => {
@@ -254,36 +269,22 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
                     }}
                     onMouseUp={() => setPressedKey(null)}
                     onMouseLeave={() => setPressedKey(null)}
-                    sx={{
-                      ...getKeyStyle(key),
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: isLetterKey ? 'flex-start' : 'center',
-                      lineHeight: 1,
-                      width: '100%',
-                    }}
+                    sx={keyStyle}
                   >
-                    {isLetterKey ? (
-                      <>
-                        <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', marginRight: '4px', fontSize: '0.8rem' }}>
-                          {getKeyLabel(key)}
+                    <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', fontSize: '0.8rem' }}>
+                      {getKeyLabel(key)}
+                    </Typography>
+                    {isLetterKey && (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 0.5 }}>
+                        <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
+                          {shengmu}
                         </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                          <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
-                            {shengmu}
+                        {yunmu.map((ym, index) => (
+                          <Typography key={index} variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
+                            {ym}
                           </Typography>
-                          {yunmu.map((ym, index) => (
-                            <Typography key={index} variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
-                              {ym}
-                            </Typography>
-                          ))}
-                        </Box>
-                      </>
-                    ) : (
-                      <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', fontSize: '0.8rem' }}>
-                        {getKeyLabel(key)}
-                      </Typography>
+                        ))}
+                      </Box>
                     )}
                   </Button>
                 </Grid>
