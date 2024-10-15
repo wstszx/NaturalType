@@ -271,21 +271,38 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
                     onMouseLeave={() => setPressedKey(null)}
                     sx={keyStyle}
                   >
-                    <Typography variant="body2" component="div" sx={{ fontWeight: 'bold', fontSize: '0.8rem' }}>
-                      {getKeyLabel(key)}
-                    </Typography>
-                    {isLetterKey && (
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 0.5 }}>
-                        <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
-                          {shengmu}
-                        </Typography>
-                        {yunmu.map((ym, index) => (
-                          <Typography key={index} variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
-                            {ym}
+                    <Box sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      width: '100%', 
+                      alignItems: 'center'
+                    }}>
+                      <Typography variant="body2" component="div" sx={{ 
+                        fontWeight: 'bold', 
+                        fontSize: '0.8rem',
+                        flexGrow: 1,
+                        textAlign: 'left'
+                      }}>
+                        {getKeyLabel(key)}
+                      </Typography>
+                      {isLetterKey && (
+                        <Box sx={{ 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          alignItems: 'flex-end',
+                          ml: 1
+                        }}>
+                          <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
+                            {shengmu}
                           </Typography>
-                        ))}
-                      </Box>
-                    )}
+                          {yunmu.map((ym, index) => (
+                            <Typography key={index} variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
+                              {ym}
+                            </Typography>
+                          ))}
+                        </Box>
+                      )}
+                    </Box>
                   </Button>
                 </Grid>
               );
