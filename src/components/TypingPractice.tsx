@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Typography, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import Keyboard from './Keyboard';
+import Keyboard, { LightEffect } from './Keyboard';
 import { articles } from '../data/articles';
 import { shuangpinSchemes, ShuangpinSchemeName } from '../data/shuangpinSchemes';
 import { pinyin } from 'pinyin-pro';
 import { SelectChangeEvent } from '@mui/material/Select';
-
-// Add this type definition
-type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'sparkle' | 'neon' | 'gradient' | 'typing';
 
 // 检查字符是否为标点符号或非汉字的函数
 const isPunctuationOrNonChinese = (char: string): boolean => {
@@ -239,21 +236,21 @@ const TypingPractice: React.FC = () => {
         </Grid>
         <Grid item>
           <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel id="light-effect-label">Light Effect</InputLabel>
+            <InputLabel id="light-effect-label">灯光效果</InputLabel>
             <Select
               labelId="light-effect-label"
               value={lightEffect}
-              label="Light Effect"
+              label="灯光效果"
               onChange={handleLightEffectChange}
             >
-              <MenuItem value="rainbow">Rainbow</MenuItem>
-              <MenuItem value="pulse">Pulse</MenuItem>
-              <MenuItem value="wave">Wave</MenuItem>
-              <MenuItem value="static">Static</MenuItem>
-              <MenuItem value="sparkle">Sparkle</MenuItem>
-              <MenuItem value="neon">Neon</MenuItem>
-              <MenuItem value="gradient">Gradient</MenuItem>
-              <MenuItem value="typing">Typing</MenuItem>
+              <MenuItem value="rainbow">彩虹</MenuItem>
+              <MenuItem value="pulse">脉冲</MenuItem>
+              <MenuItem value="wave">波浪</MenuItem>
+              <MenuItem value="static">静态</MenuItem>
+              <MenuItem value="blink">闪烁</MenuItem>
+              <MenuItem value="neon">霓虹</MenuItem>
+              <MenuItem value="gradient">渐变</MenuItem>
+              <MenuItem value="typing">打字</MenuItem>
             </Select>
           </FormControl>
         </Grid>
