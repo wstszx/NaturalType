@@ -247,10 +247,8 @@ const TypingPractice: React.FC = () => {
               <MenuItem value="pulse">脉冲</MenuItem>
               <MenuItem value="wave">波浪</MenuItem>
               <MenuItem value="static">静态</MenuItem>
-              <MenuItem value="blink">闪烁</MenuItem>
               <MenuItem value="neon">霓虹</MenuItem>
               <MenuItem value="gradient">渐变</MenuItem>
-              <MenuItem value="typing">打字</MenuItem>
             </Select>
           </FormControl>
         </Grid>

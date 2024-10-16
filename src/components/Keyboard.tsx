@@ -5,7 +5,7 @@ import { SxProps, Theme } from '@mui/system';
 import { ShuangpinScheme } from '../data/shuangpinSchemes';
 
 // 将 LightEffect 类型导出，以便 TypingPractice 可以使用
-export type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'sparkle' | 'neon' | 'gradient' | 'typing';
+export type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'neon' | 'gradient';
 
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
@@ -71,11 +71,6 @@ const waveLight = keyframes`
   100% { box-shadow: 0 0 5px #4FC3F7, 0 0 10px #4FC3F7, 0 0 15px #4FC3F7; }
 `;
 
-const sparkleLight = keyframes`
-  0%, 100% { box-shadow: 0 0 4px #FFF, 0 0 8px #FFF, 0 0 12px #FFF, 0 0 16px #FF00DE, 0 0 30px #FF00DE; }
-  50% { box-shadow: 0 0 4px #FFF, 0 0 8px #FFF, 0 0 12px #FFF, 0 0 16px #00FFFF, 0 0 30px #00FFFF; }
-`;
-
 const neonLight = keyframes`
   0%, 100% { box-shadow: 0 0 5px #FF00DE, 0 0 10px #FF00DE, 0 0 15px #FF00DE, 0 0 20px #FF00DE; }
   50% { box-shadow: 0 0 10px #FF00DE, 0 0 20px #FF00DE, 0 0 30px #FF00DE, 0 0 40px #FF00DE; }
@@ -85,11 +80,6 @@ const gradientLight = keyframes`
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
-`;
-
-const typingLight = keyframes`
-  0%, 100% { box-shadow: 0 0 5px #4CAF50, 0 0 10px #4CAF50; }
-  50% { box-shadow: 0 0 20px #4CAF50, 0 0 30px #4CAF50; }
 `;
 
 const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lightEffect }) => {
@@ -262,9 +252,6 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
         case 'static':
           style.boxShadow = '0 0 15px #FFA726';
           break;
-        case 'sparkle':
-          style.animation = `${sparkleLight} 1.5s infinite`;
-          break;
         case 'neon':
           style.animation = `${neonLight} 1s infinite`;
           style.color = '#FF00DE';
@@ -274,11 +261,6 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
           style.backgroundSize = '200% 200%';
           style.animation = `${gradientLight} 3s ease infinite`;
           style.color = '#000';
-          break;
-        case 'typing':
-          style.animation = `${typingLight} 0.5s infinite`;
-          style.backgroundColor = '#E8F5E9';
-          style.color = '#4CAF50';
           break;
       }
     }
