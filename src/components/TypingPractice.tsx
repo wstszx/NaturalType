@@ -249,6 +249,12 @@ const TypingPractice: React.FC = () => {
               <MenuItem value="static">静态</MenuItem>
               <MenuItem value="neon">霓虹</MenuItem>
               <MenuItem value="gradient">渐变</MenuItem>
+              <MenuItem value="firefly">萤火虫</MenuItem>
+              <MenuItem value="matrix">矩阵</MenuItem>
+              <MenuItem value="sparkle">闪烁</MenuItem>
+              <MenuItem value="cosmic">宇宙</MenuItem>
+              <MenuItem value="aurora">极光</MenuItem>
+              <MenuItem value="laser">激光</MenuItem>
             </Select>
           </FormControl>
         </Grid>

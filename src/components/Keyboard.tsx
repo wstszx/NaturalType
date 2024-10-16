@@ -5,7 +5,7 @@ import { SxProps, Theme } from '@mui/system';
 import { ShuangpinScheme } from '../data/shuangpinSchemes';
 
 // 将 LightEffect 类型导出，以便 TypingPractice 可以使用
-export type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'neon' | 'gradient';
+export type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'neon' | 'gradient' | 'firefly' | 'matrix' | 'sparkle' | 'cosmic' | 'aurora' | 'laser';
 
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
@@ -80,6 +80,42 @@ const gradientLight = keyframes`
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+`;
+
+const fireflyLight = keyframes`
+  0%, 100% { box-shadow: 0 0 0 -2px rgba(255, 255, 0, 0), 0 0 0 -2px rgba(255, 255, 0, 0), 0 0 0 -2px rgba(255, 255, 0, 0), 0 0 0 -2px rgba(255, 255, 0, 0); }
+  25% { box-shadow: 0 0 2px 1px rgba(255, 255, 0, 0.75), 0 0 4px 2px rgba(255, 255, 0, 0.75), 0 0 6px 3px rgba(255, 255, 0, 0.75), 0 0 8px 4px rgba(255, 255, 0, 0.75); }
+  50% { box-shadow: 0 0 4px 2px rgba(255, 255, 0, 0.5), 0 0 8px 4px rgba(255, 255, 0, 0.5), 0 0 12px 6px rgba(255, 255, 0, 0.5), 0 0 16px 8px rgba(255, 255, 0, 0.5); }
+  75% { box-shadow: 0 0 2px 1px rgba(255, 255, 0, 0.25), 0 0 4px 2px rgba(255, 255, 0, 0.25), 0 0 6px 3px rgba(255, 255, 0, 0.25), 0 0 8px 4px rgba(255, 255, 0, 0.25); }
+`;
+
+const matrixLight = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00; color: #00FF00; }
+  50% { box-shadow: 0 0 10px #003300, 0 0 20px #003300, 0 0 30px #003300; color: #003300; }
+`;
+
+const sparkleLight = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #FFF, 0 0 10px #FFF, 0 0 15px #FFF, 0 0 20px #FFF; }
+  25%, 75% { box-shadow: none; }
+  50% { box-shadow: 0 0 10px #FFF, 0 0 20px #FFF, 0 0 30px #FFF, 0 0 40px #FFF, 0 0 50px #FFF; }
+`;
+
+// 添加新的动画效果
+const cosmicLight = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #8A2BE2, 0 0 10px #8A2BE2, 0 0 15px #8A2BE2; background-color: #000033; }
+  33% { box-shadow: 0 0 10px #4B0082, 0 0 20px #4B0082, 0 0 30px #4B0082; background-color: #000066; }
+  66% { box-shadow: 0 0 15px #9400D3, 0 0 30px #9400D3, 0 0 45px #9400D3; background-color: #000099; }
+`;
+
+const auroraLight = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #80FF00, 0 0 10px #80FF00, 0 0 15px #80FF00; background-color: #001100; }
+  33% { box-shadow: 0 0 10px #00FFFF, 0 0 20px #00FFFF, 0 0 30px #00FFFF; background-color: #001122; }
+  66% { box-shadow: 0 0 15px #FF00FF, 0 0 30px #FF00FF, 0 0 45px #FF00FF; background-color: #110011; }
+`;
+
+const laserLight = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #FF0000, 0 0 10px #FF0000, 0 0 15px #FF0000; }
+  50% { box-shadow: 0 0 20px #FF0000, 0 0 40px #FF0000, 0 0 60px #FF0000, 0 0 80px #FF0000; }
 `;
 
 const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lightEffect }) => {
@@ -261,6 +297,33 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
           style.backgroundSize = '200% 200%';
           style.animation = `${gradientLight} 3s ease infinite`;
           style.color = '#000';
+          break;
+        case 'firefly':
+          style.animation = `${fireflyLight} 2s infinite`;
+          style.backgroundColor = '#333';
+          style.color = '#FFF';
+          break;
+        case 'matrix':
+          style.animation = `${matrixLight} 1.5s infinite`;
+          style.backgroundColor = '#000';
+          break;
+        case 'sparkle':
+          style.animation = `${sparkleLight} 1s infinite`;
+          style.backgroundColor = '#000';
+          style.color = '#FFF';
+          break;
+        case 'cosmic':
+          style.animation = `${cosmicLight} 3s infinite`;
+          style.color = '#FFFFFF';
+          break;
+        case 'aurora':
+          style.animation = `${auroraLight} 5s infinite`;
+          style.color = '#FFFFFF';
+          break;
+        case 'laser':
+          style.animation = `${laserLight} 0.5s infinite`;
+          style.backgroundColor = '#000000';
+          style.color = '#FF0000';
           break;
       }
     }
