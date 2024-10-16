@@ -183,7 +183,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
 
     // 为字母键设置固定宽度
     if (/^[a-zA-Z]$/.test(key)) {
-      style.width = '50px';  // 或者其他适合的固定宽度
+      style.width = '55px';  // 或者其他适合的固定宽度
       style.flexGrow = 0;    // 防止 flex 增长
     } else {
       // 其他键的 flexGrow 逻辑保持不变
