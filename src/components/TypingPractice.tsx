@@ -6,6 +6,9 @@ import { shuangpinSchemes, ShuangpinSchemeName } from '../data/shuangpinSchemes'
 import { pinyin } from 'pinyin-pro';
 import { SelectChangeEvent } from '@mui/material/Select';
 
+// Add this type definition
+type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'sparkle' | 'neon' | 'gradient' | 'typing';
+
 // 检查字符是否为标点符号或非汉字的函数
 const isPunctuationOrNonChinese = (char: string): boolean => {
   const regex = /[^\u4e00-\u9fa5]/;
@@ -77,6 +80,7 @@ const TypingPractice: React.FC = () => {
   const [openDonateDialog, setOpenDonateDialog] = useState(false);
   const [articlePinyin, setArticlePinyin] = useState<string[]>([]);
   const [currentScheme, setCurrentScheme] = useState<ShuangpinSchemeName>("微软双拼");
+  const [lightEffect, setLightEffect] = useState<LightEffect>('rainbow');
 
   const handleKeyPress = useCallback((key: string) => {
     const lowerCaseKey = key.toLowerCase();
@@ -200,6 +204,10 @@ const TypingPractice: React.FC = () => {
     setTypedKeys([]);
   };
 
+  const handleLightEffectChange = (event: SelectChangeEvent<LightEffect>) => {
+    setLightEffect(event.target.value as LightEffect);
+  };
+
   return (
     <Box sx={{ textAlign: 'center', p: 2 }}>
       <Typography variant="h4" gutterBottom>
@@ -229,6 +237,26 @@ const TypingPractice: React.FC = () => {
             </Select>
           </FormControl>
         </Grid>
+        <Grid item>
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel id="light-effect-label">Light Effect</InputLabel>
+            <Select
+              labelId="light-effect-label"
+              value={lightEffect}
+              label="Light Effect"
+              onChange={handleLightEffectChange}
+            >
+              <MenuItem value="rainbow">Rainbow</MenuItem>
+              <MenuItem value="pulse">Pulse</MenuItem>
+              <MenuItem value="wave">Wave</MenuItem>
+              <MenuItem value="static">Static</MenuItem>
+              <MenuItem value="sparkle">Sparkle</MenuItem>
+              <MenuItem value="neon">Neon</MenuItem>
+              <MenuItem value="gradient">Gradient</MenuItem>
+              <MenuItem value="typing">Typing</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
       <Container maxWidth="md" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ width: '100%', maxWidth: 800 }}>
@@ -245,6 +273,7 @@ const TypingPractice: React.FC = () => {
             onKeyPress={handleKeyPress} 
             currentKey={currentKey}
             scheme={shuangpinSchemes[currentScheme]}
+            lightEffect={lightEffect}
           />
           <Box sx={{ mt: 2 }}>
             <Button variant="contained" onClick={handleNextArticle} sx={{ mr: 2 }}>

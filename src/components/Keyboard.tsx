@@ -4,10 +4,14 @@ import { keyframes } from '@emotion/react';
 import { SxProps, Theme } from '@mui/system';
 import { ShuangpinScheme } from '../data/shuangpinSchemes';
 
+// 将 LightEffect 类型导出，以便 TypingPractice 可以使用
+export type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'sparkle' | 'neon' | 'gradient' | 'typing';
+
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
   currentKey: string;
   scheme: ShuangpinScheme;
+  lightEffect: LightEffect;
 }
 
 const keys = [
@@ -31,9 +35,6 @@ const rainbowLights = keyframes`
   71% { box-shadow: 0 0 5px ${rainbowColors[5]}, 0 0 10px ${rainbowColors[5]}, 0 0 15px ${rainbowColors[5]}; }
   85% { box-shadow: 0 0 5px ${rainbowColors[6]}, 0 0 10px ${rainbowColors[6]}, 0 0 15px ${rainbowColors[6]}; }
 `;
-
-// Add new light effect types
-type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'sparkle' | 'neon' | 'gradient' | 'typing';
 
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
   constructor(props: {children: React.ReactNode}) {
@@ -91,15 +92,12 @@ const typingLight = keyframes`
   50% { box-shadow: 0 0 20px #4CAF50, 0 0 30px #4CAF50; }
 `;
 
-const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) => {
+const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lightEffect }) => {
   console.log('Rendering Keyboard. currentKey:', currentKey);
 
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [rippleOrigin, setRippleOrigin] = useState<{ row: number; col: number } | null>(null);
   const renderCount = useRef(0);
-
-  // Add new state for light effect
-  const [lightEffect, setLightEffect] = useState<LightEffect>('rainbow');
 
   const getKeyPosition = useCallback((key: string) => {
     for (let row = 0; row < keys.length; row++) {
@@ -328,25 +326,6 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
         maxWidth: '1000px',
         margin: '0 auto',
       }}>
-        <FormControl sx={{ mb: 2, minWidth: 120, maxWidth: 200 }}>
-          <InputLabel id="light-effect-label">Light Effect</InputLabel>
-          <Select
-            labelId="light-effect-label"
-            value={lightEffect}
-            label="Light Effect"
-            onChange={(e) => setLightEffect(e.target.value as LightEffect)}
-            sx={{ width: 'auto' }}
-          >
-            <MenuItem value="rainbow">Rainbow</MenuItem>
-            <MenuItem value="pulse">Pulse</MenuItem>
-            <MenuItem value="wave">Wave</MenuItem>
-            <MenuItem value="static">Static</MenuItem>
-            <MenuItem value="sparkle">Sparkle</MenuItem>
-            <MenuItem value="neon">Neon</MenuItem>
-            <MenuItem value="gradient">Gradient</MenuItem>
-            <MenuItem value="typing">Typing</MenuItem>
-          </Select>
-        </FormControl>
         {keys.map((row, rowIndex) => (
           <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
             {row.map((key) => {
