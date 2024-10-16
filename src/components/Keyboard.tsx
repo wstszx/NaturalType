@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Button, Grid, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { SxProps, Theme } from '@mui/system';
 import { ShuangpinScheme } from '../data/shuangpinSchemes';
@@ -32,6 +32,9 @@ const rainbowLights = keyframes`
   85% { box-shadow: 0 0 5px ${rainbowColors[6]}, 0 0 10px ${rainbowColors[6]}, 0 0 15px ${rainbowColors[6]}; }
 `;
 
+// Add new light effect types
+type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'sparkle' | 'neon' | 'gradient' | 'typing';
+
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
   constructor(props: {children: React.ReactNode}) {
     super(props);
@@ -55,12 +58,48 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
   }
 }
 
+const pulseLight = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #FFA726, 0 0 10px #FFA726, 0 0 15px #FFA726; }
+  50% { box-shadow: 0 0 10px #FF6F00, 0 0 20px #FF6F00, 0 0 30px #FF6F00; }
+`;
+
+const waveLight = keyframes`
+  0% { box-shadow: 0 0 5px #4FC3F7, 0 0 10px #4FC3F7, 0 0 15px #4FC3F7; }
+  33% { box-shadow: 0 0 5px #81C784, 0 0 10px #81C784, 0 0 15px #81C784; }
+  66% { box-shadow: 0 0 5px #FFD54F, 0 0 10px #FFD54F, 0 0 15px #FFD54F; }
+  100% { box-shadow: 0 0 5px #4FC3F7, 0 0 10px #4FC3F7, 0 0 15px #4FC3F7; }
+`;
+
+const sparkleLight = keyframes`
+  0%, 100% { box-shadow: 0 0 4px #FFF, 0 0 8px #FFF, 0 0 12px #FFF, 0 0 16px #FF00DE, 0 0 30px #FF00DE; }
+  50% { box-shadow: 0 0 4px #FFF, 0 0 8px #FFF, 0 0 12px #FFF, 0 0 16px #00FFFF, 0 0 30px #00FFFF; }
+`;
+
+const neonLight = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #FF00DE, 0 0 10px #FF00DE, 0 0 15px #FF00DE, 0 0 20px #FF00DE; }
+  50% { box-shadow: 0 0 10px #FF00DE, 0 0 20px #FF00DE, 0 0 30px #FF00DE, 0 0 40px #FF00DE; }
+`;
+
+const gradientLight = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
+const typingLight = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #4CAF50, 0 0 10px #4CAF50; }
+  50% { box-shadow: 0 0 20px #4CAF50, 0 0 30px #4CAF50; }
+`;
+
 const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) => {
   console.log('Rendering Keyboard. currentKey:', currentKey);
 
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [rippleOrigin, setRippleOrigin] = useState<{ row: number; col: number } | null>(null);
   const renderCount = useRef(0);
+
+  // Add new state for light effect
+  const [lightEffect, setLightEffect] = useState<LightEffect>('rainbow');
 
   const getKeyPosition = useCallback((key: string) => {
     for (let row = 0; row < keys.length; row++) {
@@ -206,17 +245,48 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
     }
 
     if (isHighlighted) {
-      console.log(`Highlighting key: ${key}`); // 添加高亮日志
+      console.log(`Highlighting key: ${key}`);
       style = {
         ...style,
-        backgroundColor: '#FFA726', // 使用更明显的颜色
-        boxShadow: '0 0 15px rgba(255, 167, 38, 0.7)',
-        animation: `${rainbowLights} 1.5s infinite`,
+        backgroundColor: '#FFA726',
       };
+
+      switch (lightEffect) {
+        case 'rainbow':
+          style.animation = `${rainbowLights} 1.5s infinite`;
+          break;
+        case 'pulse':
+          style.animation = `${pulseLight} 1s infinite`;
+          break;
+        case 'wave':
+          style.animation = `${waveLight} 3s infinite`;
+          break;
+        case 'static':
+          style.boxShadow = '0 0 15px #FFA726';
+          break;
+        case 'sparkle':
+          style.animation = `${sparkleLight} 1.5s infinite`;
+          break;
+        case 'neon':
+          style.animation = `${neonLight} 1s infinite`;
+          style.color = '#FF00DE';
+          break;
+        case 'gradient':
+          style.backgroundImage = 'linear-gradient(45deg, #FF00DE, #00FFFF, #FF00DE)';
+          style.backgroundSize = '200% 200%';
+          style.animation = `${gradientLight} 3s ease infinite`;
+          style.color = '#000';
+          break;
+        case 'typing':
+          style.animation = `${typingLight} 0.5s infinite`;
+          style.backgroundColor = '#E8F5E9';
+          style.color = '#4CAF50';
+          break;
+      }
     }
 
     return style;
-  }, [pressedKey, rippleOrigin, currentKey, getKeyPosition]);
+  }, [pressedKey, rippleOrigin, currentKey, getKeyPosition, lightEffect]);
 
   const getKeyLabel = (key: string) => {
     switch (key) {
@@ -255,9 +325,28 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme }) =
         backgroundColor: '#F3EDF7',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
         width: '100%',
-        maxWidth: '1000px', // Slightly reduced max width
+        maxWidth: '1000px',
         margin: '0 auto',
       }}>
+        <FormControl sx={{ mb: 2, minWidth: 120, maxWidth: 200 }}>
+          <InputLabel id="light-effect-label">Light Effect</InputLabel>
+          <Select
+            labelId="light-effect-label"
+            value={lightEffect}
+            label="Light Effect"
+            onChange={(e) => setLightEffect(e.target.value as LightEffect)}
+            sx={{ width: 'auto' }}
+          >
+            <MenuItem value="rainbow">Rainbow</MenuItem>
+            <MenuItem value="pulse">Pulse</MenuItem>
+            <MenuItem value="wave">Wave</MenuItem>
+            <MenuItem value="static">Static</MenuItem>
+            <MenuItem value="sparkle">Sparkle</MenuItem>
+            <MenuItem value="neon">Neon</MenuItem>
+            <MenuItem value="gradient">Gradient</MenuItem>
+            <MenuItem value="typing">Typing</MenuItem>
+          </Select>
+        </FormControl>
         {keys.map((row, rowIndex) => (
           <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
             {row.map((key) => {
