@@ -112,7 +112,7 @@ export const shuangpinSchemes: { [schemeName: string]: ShuangpinScheme } = {
     'k': { shengmu: 'k', yunmu: 'iao' },
     'l': { shengmu: 'l', yunmu: 'in' },
     'z': { shengmu: 'z', yunmu: 'un' },
-    'x': { shengmu: 'x', yunmu: ['uai', 'ue', 've'] },
+    'x': { shengmu: 'x', yunmu: ['uai', 'ue'] },
     'c': { shengmu: 'c', yunmu: 'uan' },
     'v': { shengmu: 'zh', yunmu: ['ui', 'v'] },
     'b': { shengmu: 'b', yunmu: ['ia', 'ua'] },
