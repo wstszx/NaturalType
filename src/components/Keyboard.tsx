@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { SxProps, Theme } from '@mui/system';
-import { ShuangpinScheme } from '../data/shuangpinSchemes';
+import { ShuangpinScheme, ShuangpinSchemeName } from '../data/shuangpinSchemes';
 
 // 将 LightEffect 类型导出，以便 TypingPractice 可以使用
 export type LightEffect = 'rainbow' | 'pulse' | 'wave' | 'static' | 'neon' | 'gradient' | 'firefly' | 'matrix' | 'sparkle' | 'cosmic' | 'aurora' | 'laser';
@@ -12,6 +12,7 @@ interface KeyboardProps {
   currentKey: string;
   scheme: ShuangpinScheme;
   lightEffect: LightEffect;
+  schemeName: ShuangpinSchemeName; // 添加这一行
 }
 
 const keys = [
@@ -118,7 +119,7 @@ const laserLight = keyframes`
   50% { box-shadow: 0 0 20px #FF0000, 0 0 40px #FF0000, 0 0 60px #FF0000, 0 0 80px #FF0000; }
 `;
 
-const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lightEffect }) => {
+const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lightEffect, schemeName }) => {
   console.log('Rendering Keyboard. currentKey:', currentKey);
 
   const [pressedKey, setPressedKey] = useState<string | null>(null);
@@ -352,7 +353,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
 
   const getShuangpinLabel = (key: string) => {
     const lowerKey = key.toLowerCase();
-    if (lowerKey === ';' && scheme.name === 'Microsoft') {
+    if (lowerKey === ';' && schemeName === '微软双拼') {
       return { shengmu: '', yunmu: ['ing'] };
     }
     if (scheme[lowerKey]) {

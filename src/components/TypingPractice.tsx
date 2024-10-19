@@ -326,6 +326,7 @@ const TypingPractice: React.FC = () => {
                   currentKey={currentKey}
                   scheme={shuangpinSchemes[currentScheme]}
                   lightEffect={lightEffect}
+                  schemeName={currentScheme} // 添加这一行
                 />
               </Box>
             </CardContent>
