@@ -123,9 +123,9 @@ export const shuangpinSchemes: { [schemeName: string]: ShuangpinScheme } = {
     'q': { shengmu: 'q', yunmu: 'iu' },
     'w': { shengmu: 'w', yunmu: ['ia', 'ua'] },
     'e': { yunmu: 'e' },
-    'r': { shengmu: 'r', yunmu: 'uan' },
-    't': { shengmu: 't', yunmu: 'ue' },
-    'y': { shengmu: 'y', yunmu: ['uai', 'v'] },
+    'r': { shengmu: 'r', yunmu: ['uan', 'er'] },  // 添加 'er' 韵母
+    't': { shengmu: 't', yunmu: ['ue', 've'] },  // 添加 've'
+    'y': { shengmu: 'y', yunmu: ['uai', 'v'] },  // 保留 'v'，添加 'uai'
     'u': { shengmu: 'sh', yunmu: 'u' },
     'i': { shengmu: 'ch', yunmu: 'i' },
     'o': { yunmu: ['o', 'uo'] },
@@ -139,11 +139,11 @@ export const shuangpinSchemes: { [schemeName: string]: ShuangpinScheme } = {
     'j': { shengmu: 'j', yunmu: 'an' },
     'k': { shengmu: 'k', yunmu: 'ao' },
     'l': { shengmu: 'l', yunmu: 'ai' },
-    ';': { yunmu: 'ing' },
+    ';': { yunmu: 'ing' },  // 确保 'ing' 在分号键
     'z': { shengmu: 'z', yunmu: 'ei' },
     'x': { shengmu: 'x', yunmu: 'ie' },
     'c': { shengmu: 'c', yunmu: 'iao' },
-    'v': { shengmu: 'zh', yunmu: 'ui' },
+    'v': { shengmu: 'zh', yunmu: 'ui' },  // 移除 'v'
     'b': { shengmu: 'b', yunmu: 'ou' },
     'n': { shengmu: 'n', yunmu: 'in' },
     'm': { shengmu: 'm', yunmu: 'ian' },
