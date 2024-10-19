@@ -12,7 +12,8 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "@mui/material": "^5.16.7",
+    "@mui/icons-material": "^6.1.4",
+    "@mui/material": "^6.1.4",
     "lucide-react": "^0.344.0",
     "natural-code-typing-practice": "file:",
     "pinyin-pro": "^3.25.0",

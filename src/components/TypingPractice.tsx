@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Typography, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { 
+  Box, Typography, Button, Container, Dialog, DialogActions, DialogContent, 
+  DialogContentText, DialogTitle, Grid, Select, MenuItem, FormControl, 
+  InputLabel, Card, CardContent, LinearProgress, Fab, 
+  useTheme, ThemeProvider, createTheme
+} from '@mui/material';
+import { Brightness4, Brightness7 } from '@mui/icons-material';
 import Keyboard, { LightEffect } from './Keyboard';
 import { articles } from '../data/articles';
 import { shuangpinSchemes, ShuangpinSchemeName } from '../data/shuangpinSchemes';
@@ -78,6 +84,23 @@ const TypingPractice: React.FC = () => {
   const [articlePinyin, setArticlePinyin] = useState<string[]>([]);
   const [currentScheme, setCurrentScheme] = useState<ShuangpinSchemeName>("微软双拼");
   const [lightEffect, setLightEffect] = useState<LightEffect>('rainbow');
+  const [progress, setProgress] = useState(0);
+  const [darkMode, setDarkMode] = useState(false);
+
+  const theme = useTheme();
+  const darkTheme = createTheme({
+    ...theme,
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+      primary: {
+        main: darkMode ? '#90caf9' : '#1976d2',
+      },
+      background: {
+        default: darkMode ? '#303030' : '#f5f5f5',
+        paper: darkMode ? '#424242' : '#ffffff',
+      },
+    },
+  });
 
   const handleKeyPress = useCallback((key: string) => {
     const lowerCaseKey = key.toLowerCase();
@@ -131,6 +154,7 @@ const TypingPractice: React.FC = () => {
       setCurrentKeyIndex(0);
       setCurrentKey(nextShuangpinCode[0].toLowerCase());
       setTypedKeys([]);
+      setProgress((nextIndex / text.length) * 100);
     } else {
       console.log('Reached end of text');
       setOpenDialog(true); // 打开弹窗
@@ -206,138 +230,173 @@ const TypingPractice: React.FC = () => {
   };
 
   return (
-    <Box sx={{ textAlign: 'center', p: 2 }}>
-      <Typography variant="h4" gutterBottom>
-        双拼练习系统
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom>
-        提高您的双拼输入速度和准确性
-      </Typography>
-      <Grid container spacing={2} alignItems="center" justifyContent="center" sx={{ mb: 2 }}>
-        <Grid item>
-          <Typography variant="h6">
-            {articles[currentArticleIndex].title}
+    <ThemeProvider theme={darkTheme}>
+      <Box sx={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        backgroundColor: 'background.default',
+        color: 'text.primary',
+        transition: 'background-color 0.3s, color 0.3s'
+      }}>
+        <Container maxWidth="lg" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', py: 2 }}>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
+            双拼练习系统
           </Typography>
-        </Grid>
-        <Grid item>
-          <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel id="scheme-select-label">双拼方案</InputLabel>
-            <Select
-              labelId="scheme-select-label"
-              id="scheme-select"
-              value={currentScheme}
-              label="双拼方案"
-              onChange={handleSchemeChange}
-            >
-              {Object.keys(shuangpinSchemes).map((schemeName) => (
-                <MenuItem key={schemeName} value={schemeName}>
-                  {schemeName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item>
-          <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel id="light-effect-label">灯光效果</InputLabel>
-            <Select
-              labelId="light-effect-label"
-              value={lightEffect}
-              label="灯光效果"
-              onChange={handleLightEffectChange}
-            >
-              <MenuItem value="rainbow">彩虹</MenuItem>
-              <MenuItem value="pulse">脉冲</MenuItem>
-              <MenuItem value="wave">波浪</MenuItem>
-              <MenuItem value="static">静态</MenuItem>
-              <MenuItem value="neon">霓虹</MenuItem>
-              <MenuItem value="gradient">渐变</MenuItem>
-              <MenuItem value="firefly">萤火虫</MenuItem>
-              <MenuItem value="matrix">矩阵</MenuItem>
-              <MenuItem value="sparkle">闪烁</MenuItem>
-              <MenuItem value="cosmic">宇宙</MenuItem>
-              <MenuItem value="aurora">极光</MenuItem>
-              <MenuItem value="laser">激光</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      </Grid>
-      <Container maxWidth="md" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Box sx={{ width: '100%', maxWidth: 800 }}>
-          <Box sx={{ mb: 2, height: 150, overflowY: 'auto' }}>
-            <Typography variant="body1" sx={{ fontSize: '1.2rem', textAlign: 'left' }}>
-              {text.split('').map((char, index) => (
-                <span key={index} style={{ color: index < currentIndex ? 'green' : index === currentIndex ? 'blue' : 'black' }}>
-                  {char}
-                </span>
-              ))}
-            </Typography>
-          </Box>
-          <Keyboard 
-            onKeyPress={handleKeyPress} 
-            currentKey={currentKey}
-            scheme={shuangpinSchemes[currentScheme]}
-            lightEffect={lightEffect}
-          />
-          <Box sx={{ mt: 2 }}>
-            <Button variant="contained" onClick={handleNextArticle} sx={{ mr: 2 }}>
+          
+          <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
+            <Grid item xs={12} sm={6} md={3}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="scheme-select-label">双拼方案</InputLabel>
+                <Select
+                  labelId="scheme-select-label"
+                  id="scheme-select"
+                  value={currentScheme}
+                  label="双拼方案"
+                  onChange={handleSchemeChange}
+                >
+                  {Object.keys(shuangpinSchemes).map((schemeName) => (
+                    <MenuItem key={schemeName} value={schemeName}>
+                      {schemeName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="light-effect-label">灯光效果</InputLabel>
+                <Select
+                  labelId="light-effect-label"
+                  value={lightEffect}
+                  label="灯光效果"
+                  onChange={handleLightEffectChange}
+                >
+                  <MenuItem value="rainbow">彩虹</MenuItem>
+                  <MenuItem value="pulse">脉冲</MenuItem>
+                  <MenuItem value="wave">波浪</MenuItem>
+                  <MenuItem value="static">静态</MenuItem>
+                  <MenuItem value="neon">霓虹</MenuItem>
+                  <MenuItem value="gradient">渐变</MenuItem>
+                  <MenuItem value="firefly">萤火虫</MenuItem>
+                  <MenuItem value="matrix">矩阵</MenuItem>
+                  <MenuItem value="sparkle">闪烁</MenuItem>
+                  <MenuItem value="cosmic">宇宙</MenuItem>
+                  <MenuItem value="aurora">极光</MenuItem>
+                  <MenuItem value="laser">激光</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+
+          <Card elevation={3} sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <CardContent sx={{ 
+              flexGrow: 1, 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifyContent: 'space-between',
+              p: 2 // 减少内边距
+            }}>
+              <Box sx={{ mb: 0 }}> {/* 移除下边距 */}
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  {articles[currentArticleIndex].title}
+                </Typography>
+                <Box sx={{ 
+                  height: '25vh', // 保持高度不变
+                  overflowY: 'auto',
+                  mb: 0 // 移除下边距
+                }}>
+                  <Typography variant="body1" sx={{ textAlign: 'left', fontSize: '1.2rem' }}>
+                    {text.split('').map((char, index) => (
+                      <span key={index} style={{ 
+                        color: index < currentIndex ? theme.palette.success.main : 
+                               index === currentIndex ? theme.palette.primary.main : 
+                               theme.palette.text.primary 
+                      }}>
+                        {char}
+                      </span>
+                    ))}
+                  </Typography>
+                </Box>
+                <LinearProgress variant="determinate" value={progress} sx={{ mt: 0.5, mb: 0.5 }} /> {/* 调整上下边距 */}
+              </Box>
+              <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                <Keyboard 
+                  onKeyPress={handleKeyPress} 
+                  currentKey={currentKey}
+                  scheme={shuangpinSchemes[currentScheme]}
+                  lightEffect={lightEffect}
+                />
+              </Box>
+            </CardContent>
+          </Card>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
+            <Button variant="contained" color="primary" onClick={handleNextArticle}>
               下一篇文章
             </Button>
-            <Button variant="outlined" onClick={handleOpenDonateDialog}>
+            <Button variant="outlined" color="secondary" onClick={handleOpenDonateDialog}>
               捐赠支持
             </Button>
           </Box>
+        </Container>
+        
+        <Box sx={{ position: 'fixed', bottom: 16, right: 16 }}>
+          <Fab size="small" color="primary" onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? <Brightness7 /> : <Brightness4 />}
+          </Fab>
         </Box>
-      </Container>
-      <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"恭喜您完成本篇双拼练习！"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            您已经完成了当前文章的双拼输入。准备好挑战下一篇文章，进一步提升您的双拼技能了吗？
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleNextArticle} autoFocus>
-            确认
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={openDonateDialog}
-        onClose={handleCloseDonateDialog}
-        aria-labelledby="donate-dialog-title"
-        aria-describedby="donate-dialog-description"
-      >
-        <DialogTitle id="donate-dialog-title">
-          {"支持双拼练习系统"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="donate-dialog-description">
-            如果您觉得这个双拼练习工具对您的输入技能提升有帮助，可以考虑给我们一些支持。您可以通过以下方式进行捐赠：
-          </DialogContentText>
-          <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
-            <Grid item xs={6}>
-              <Typography variant="subtitle1" gutterBottom>微信支付</Typography>
-              <img src="/images/wechat_qr.png" alt="微信收款码" style={{ width: '100%', maxWidth: 200 }} />
+
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"恭喜您完成本篇双拼练习！"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              您已经完成了当前文章的双拼输入。准备好挑战下一篇文章，进一步提升您的双拼技能了吗？
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleNextArticle} autoFocus>
+              确认
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={openDonateDialog}
+          onClose={handleCloseDonateDialog}
+          aria-labelledby="donate-dialog-title"
+          aria-describedby="donate-dialog-description"
+        >
+          <DialogTitle id="donate-dialog-title">
+            {"支持双拼练习系统"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="donate-dialog-description">
+              如果您得这个双拼练习工具对您的输入技能提升有帮助，可以考虑给我们一些支持。您可以通过以下方式进行捐赠：
+            </DialogContentText>
+            <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
+              <Grid item xs={6}>
+                <Typography variant="subtitle1" gutterBottom>微信支付</Typography>
+                <img src="/images/wechat_qr.png" alt="微信收款码" style={{ width: '100%', maxWidth: 200 }} />
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="subtitle1" gutterBottom>支付宝</Typography>
+                <img src="/images/alipay_qr.png" alt="支付宝收款码" style={{ width: '100%', maxWidth: 200 }} />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <Typography variant="subtitle1" gutterBottom>支付宝</Typography>
-              <img src="/images/alipay_qr.png" alt="支付宝收款码" style={{ width: '100%', maxWidth: 200 }} />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDonateDialog}>关闭</Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDonateDialog}>关闭</Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </ThemeProvider>
   );
 };
 
