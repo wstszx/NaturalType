@@ -182,7 +182,7 @@ export const shuangpinSchemes: { [schemeName: string]: ShuangpinScheme } = {
     'w': { shengmu: 'w', yunmu: ['ia', 'ua'] },
     'e': { yunmu: 'e' },
     'r': { shengmu: 'r', yunmu: 'uan' },
-    't': { shengmu: 't', yunmu: 'ue' },
+    't': { shengmu: 't', yunmu: ['ue', 've'] },  // 同时包含 'ue' 和 've'
     'y': { shengmu: 'y', yunmu: ['ing', 'uai'] },
     'u': { shengmu: 'sh', yunmu: 'u' },
     'i': { shengmu: 'ch', yunmu: 'i' },
