@@ -208,7 +208,10 @@ const TypingPractice: React.FC = () => {
   return (
     <Box sx={{ textAlign: 'center', p: 2 }}>
       <Typography variant="h4" gutterBottom>
-        打字练习
+        双拼练习系统
+      </Typography>
+      <Typography variant="subtitle1" gutterBottom>
+        提高您的双拼输入速度和准确性
       </Typography>
       <Grid container spacing={2} alignItems="center" justifyContent="center" sx={{ mb: 2 }}>
         <Grid item>
@@ -293,11 +296,11 @@ const TypingPractice: React.FC = () => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"恭喜您完成输入！"}
+          {"恭喜您完成本篇双拼练习！"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            您已经完成了当前文章的输入。准备好挑战下一篇文章了吗？
+            您已经完成了当前文章的双拼输入。准备好挑战下一篇文章，进一步提升您的双拼技能了吗？
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -313,11 +316,11 @@ const TypingPractice: React.FC = () => {
         aria-describedby="donate-dialog-description"
       >
         <DialogTitle id="donate-dialog-title">
-          {"感谢您的支持！"}
+          {"支持双拼练习系统"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="donate-dialog-description">
-            如果您觉得这个工具对您有帮助，可以考虑给我们一些支持。您可以通过以下方式进行捐赠：
+            如果您觉得这个双拼练习工具对您的输入技能提升有帮助，可以考虑给我们一些支持。您可以通过以下方式进行捐赠：
           </DialogContentText>
           <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
             <Grid item xs={6}>
