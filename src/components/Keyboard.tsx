@@ -352,7 +352,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
 
   const getShuangpinLabel = (key: string) => {
     const lowerKey = key.toLowerCase();
-    if (lowerKey === ';') {
+    if (lowerKey === ';' && scheme.name === 'Microsoft') {
       return { shengmu: '', yunmu: ['ing'] };
     }
     if (scheme[lowerKey]) {
