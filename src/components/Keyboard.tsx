@@ -352,6 +352,9 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
 
   const getShuangpinLabel = (key: string) => {
     const lowerKey = key.toLowerCase();
+    if (lowerKey === ';') {
+      return { shengmu: '', yunmu: ['ing'] };
+    }
     if (scheme[lowerKey]) {
       const { shengmu, yunmu } = scheme[lowerKey];
       return { 
@@ -378,7 +381,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
           <Grid container justifyContent="center" key={rowIndex} spacing={0.5} sx={{ mb: 0.5 }}>
             {row.map((key) => {
               const { shengmu, yunmu } = getShuangpinLabel(key);
-              const isLetterKey = /^[a-zA-Z]$/.test(key);
+              const isLetterKey = /^[a-zA-Z;]$/.test(key);  // 修改这里，包含 ';'
               const keyStyle = getKeyStyle(key);
               return (
                 <Grid item key={key} sx={{ display: 'flex', flexGrow: keyStyle.flexGrow }}>
@@ -414,9 +417,11 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
                           alignItems: 'flex-end',
                           ml: 1
                         }}>
-                          <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
-                            {shengmu}
-                          </Typography>
+                          {shengmu && (
+                            <Typography variant="caption" component="div" sx={{ color: '#E57373', fontSize: '0.6rem' }}>
+                              {shengmu}
+                            </Typography>
+                          )}
                           {yunmu.map((ym, index) => (
                             <Typography key={index} variant="caption" component="div" sx={{ color: '#64B5F6', fontSize: '0.6rem' }}>
                               {ym}
