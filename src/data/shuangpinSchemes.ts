@@ -12,7 +12,7 @@ export const shuangpinSchemes: { [schemeName: string]: ShuangpinScheme } = {
     'e': { yunmu: 'e' },
     'r': { shengmu: 'r', yunmu: ['uan', 'er'] },
     't': { shengmu: 't', yunmu: 'ue' },
-    'y': { shengmu: 'y', yunmu: ['uai', 'v'] },
+    'y': { shengmu: 'y', yunmu: 'uai' },  // 移除 'ing'
     'u': { shengmu: 'sh', yunmu: 'u' },
     'i': { shengmu: 'ch', yunmu: 'i' },
     'o': { yunmu: ['o', 'uo'] },
@@ -26,7 +26,7 @@ export const shuangpinSchemes: { [schemeName: string]: ShuangpinScheme } = {
     'j': { shengmu: 'j', yunmu: 'an' },
     'k': { shengmu: 'k', yunmu: 'ao' },
     'l': { shengmu: 'l', yunmu: 'ai' },
-    ';': { yunmu: 'ing' },
+    ';': { yunmu: 'ing' },  // 添加 'ing' 到 ';' 键
     'z': { shengmu: 'z', yunmu: 'ei' },
     'x': { shengmu: 'x', yunmu: 'ie' },
     'c': { shengmu: 'c', yunmu: 'iao' },

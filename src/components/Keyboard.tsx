@@ -205,19 +205,24 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
 
     let style: SxProps<Theme> & { flexGrow: number; width?: string } = { ...baseStyle };
 
-    // 为字母键设置固定宽度
-    if (/^[a-zA-Z]$/.test(key)) {
+    // 为标准宽度的键设置固定宽度
+    if (/^[a-zA-Z0-9`\-=\[\];',\.\/]$/.test(key)) {
       style.width = '55px';  // 或者其他适合的固定宽度
       style.flexGrow = 0;    // 防止 flex 增长
     } else {
-      // 其他键的 flexGrow 逻辑保持不变
+      // 其他键的 flexGrow 或自定义宽度逻辑
       switch (key) {
         case 'Backspace':
           style.flexGrow = 2;
           break;
         case 'Tab':
-        case 'CapsLock':
           style.flexGrow = 1.5;
+          break;
+        case '\\':  // 反斜杠键
+          style.flexGrow = 1.5;
+          break;
+        case 'CapsLock':
+          style.flexGrow = 1.75;
           break;
         case 'Enter':
           style.flexGrow = 2.25;
@@ -240,9 +245,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress, currentKey, scheme, lig
           style.flexGrow = 1.25;
           break;
         default:
-          if (/^[a-zA-Z]$/.test(key)) {
-            style.flexGrow = 1;
-          }
+          style.flexGrow = 1;
       }
     }
 
