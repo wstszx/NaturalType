@@ -30,36 +30,49 @@ const getShuangpinCode = (char: string, pinyinStr: string, currentScheme: Shuang
     let shengmu = pinyinStr.slice(0, firstVowelIndex);
     let yunmu = pinyinStr.slice(firstVowelIndex);
 
-    console.log(`Character: ${char}`);
-    console.log(`Full Pinyin: ${pinyinStr}`);
-    console.log(`Initial Shengmu: ${shengmu || '(zero initial)'}`);
-    console.log(`Initial Yunmu: ${yunmu}`);
+    console.log('=== Debug Info for:', char, '===');
+    console.log(`Pinyin: ${pinyinStr}`);
+    console.log(`Initial split - Shengmu: "${shengmu}", Yunmu: "${yunmu}"`);
 
     // 处理特殊韵母
     if (yunmu === 'ue') yunmu = 've';
-
+    
     // 处理零声母情况
-    if (shengmu === '' && ['a', 'e', 'i', 'o', 'u'].includes(yunmu[0])) {
-      shengmu = yunmu[0];
-      yunmu = yunmu.slice(1);
-      console.log(`Zero initial case - Updated Shengmu: ${shengmu}, Updated Yunmu: ${yunmu}`);
+    if (shengmu === '') {
+      if (yunmu === 'ao') {
+        console.log('Found ao case');
+        shengmu = 'a';  // 将 'a' 作为声母
+        yunmu = 'o';    // 将 'o' 作为韵母
+      } else if (['a', 'e', 'i', 'o', 'u'].includes(yunmu[0])) {
+        shengmu = yunmu[0];
+        yunmu = yunmu.slice(1);
+      }
+      console.log(`After zero initial processing - Shengmu: "${shengmu}", Yunmu: "${yunmu}"`);
     }
 
-    // 处理单韵母情况（如"啊"、"饿"、"哦"等）
+    // 处理单韵母情况
     if (shengmu === '' && yunmu.length === 1) {
       shengmu = yunmu;
       yunmu = 'iuv'.includes(yunmu) ? 'i' : yunmu;
-      console.log(`Single vowel case - Updated Shengmu: ${shengmu}, Updated Yunmu: ${yunmu}`);
     }
 
     const currentSchemeData = shuangpinSchemes[currentScheme];
-    const shengmuKey = Object.keys(currentSchemeData).find(key => currentSchemeData[key].shengmu === shengmu) || '';
+    
+    // 查找声母对应的键
+    const shengmuKey = Object.keys(currentSchemeData).find(key => {
+      if (shengmu === 'a') return key === 'a';  // 直接匹配 'a' 声母
+      return currentSchemeData[key].shengmu === shengmu;
+    }) || '';
+
+    // 查找韵母对应的键
     const yunmuKey = Object.keys(currentSchemeData).find(key => {
       const keyYunmu = currentSchemeData[key].yunmu;
       return Array.isArray(keyYunmu) ? keyYunmu.includes(yunmu) : keyYunmu === yunmu;
     }) || '';
 
-    console.log(`Final Shuangpin code: Shengmu Key: ${shengmuKey}, Yunmu Key: ${yunmuKey}`);
+    console.log(`Looking for Shengmu: "${shengmu}" -> Found key: "${shengmuKey}"`);
+    console.log(`Looking for Yunmu: "${yunmu}" -> Found key: "${yunmuKey}"`);
+    console.log('=== End Debug Info ===');
 
     return [shengmuKey, yunmuKey] as ShuangpinCode;
   }
@@ -103,6 +116,11 @@ const TypingPractice: React.FC = () => {
   });
 
   const handleKeyPress = useCallback((key: string) => {
+    // 如果按下空格键，直接返回，不做任何处理
+    if (key === ' ') {
+      return;
+    }
+
     const lowerCaseKey = key.toLowerCase();
     const expectedKey = currentKey.toLowerCase();
 
@@ -265,7 +283,7 @@ const TypingPractice: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth size="small">
-                <InputLabel id="light-effect-label">灯光效果</InputLabel>
+                <InputLabel id="light-effect-label">��光效果</InputLabel>
                 <Select
                   labelId="light-effect-label"
                   value={lightEffect}
@@ -353,6 +371,12 @@ const TypingPractice: React.FC = () => {
           onClose={() => setOpenDialog(false)}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
+          // 添加键盘事件处理，防止空格键触发按钮
+          onKeyDown={(e) => {
+            if (e.key === ' ') {
+              e.preventDefault();
+            }
+          }}
         >
           <DialogTitle id="alert-dialog-title">
             {"恭喜您完成本篇双拼练习！"}
@@ -363,7 +387,15 @@ const TypingPractice: React.FC = () => {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleNextArticle} autoFocus>
+            <Button 
+              onClick={handleNextArticle} 
+              // 移除 autoFocus
+              onKeyDown={(e) => {
+                if (e.key === ' ') {
+                  e.preventDefault();
+                }
+              }}
+            >
               确认
             </Button>
           </DialogActions>
