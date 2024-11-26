@@ -283,7 +283,7 @@ const TypingPractice: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth size="small">
-                <InputLabel id="light-effect-label">��光效果</InputLabel>
+                <InputLabel id="light-effect-label">灯光效果</InputLabel>
                 <Select
                   labelId="light-effect-label"
                   value={lightEffect}
