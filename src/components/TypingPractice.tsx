@@ -26,6 +26,9 @@ const getArticlePinyin = (text: string): string[] => {
 // 修改：getShuangpinCode 函数现在接受预先计算的拼音
 const getShuangpinCode = (char: string, pinyinStr: string, currentScheme: ShuangpinSchemeName): ShuangpinCode => {
   if (pinyinStr) {
+    // 首先将 ü 转换为 v
+    pinyinStr = pinyinStr.replace(/ü/g, 'v');
+    
     const firstVowelIndex = pinyinStr.search(/[aeiouv]/i);
     let shengmu = pinyinStr.slice(0, firstVowelIndex);
     let yunmu = pinyinStr.slice(firstVowelIndex);
@@ -35,7 +38,7 @@ const getShuangpinCode = (char: string, pinyinStr: string, currentScheme: Shuang
     console.log(`Initial split - Shengmu: "${shengmu}", Yunmu: "${yunmu}"`);
 
     // 处理特殊韵母
-    if (yunmu === 'ue') yunmu = 've';
+    if (yunmu === 'v') yunmu = 've';  // 简化处理，v 直接转为 ve
     
     // 处理零声母情况
     if (shengmu === '') {
