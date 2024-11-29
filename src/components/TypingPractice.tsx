@@ -26,7 +26,7 @@ const getArticlePinyin = (text: string): string[] => {
 // 修改：getShuangpinCode 函数现在接受预先计算的拼音
 const getShuangpinCode = (char: string, pinyinStr: string, currentScheme: ShuangpinSchemeName): ShuangpinCode => {
   if (pinyinStr) {
-    // 首先将 ü 转换为 v
+    // 首先将 ü 转换为 v，这样就和实际输入方式一致
     pinyinStr = pinyinStr.replace(/ü/g, 'v');
     
     const firstVowelIndex = pinyinStr.search(/[aeiouv]/i);
@@ -36,16 +36,15 @@ const getShuangpinCode = (char: string, pinyinStr: string, currentScheme: Shuang
     console.log('=== Debug Info for:', char, '===');
     console.log(`Pinyin: ${pinyinStr}`);
     console.log(`Initial split - Shengmu: "${shengmu}", Yunmu: "${yunmu}"`);
+    console.log('Current scheme:', currentScheme);
 
-    // 处理特殊韵母
-    if (yunmu === 'v') yunmu = 've';  // 简化处理，v 直接转为 ve
+    const currentSchemeData = shuangpinSchemes[currentScheme];
     
     // 处理零声母情况
     if (shengmu === '') {
       if (yunmu === 'ao') {
-        console.log('Found ao case');
-        shengmu = 'a';  // 将 'a' 作为声母
-        yunmu = 'o';    // 将 'o' 作为韵母
+        shengmu = 'a';
+        yunmu = 'o';
       } else if (['a', 'e', 'i', 'o', 'u'].includes(yunmu[0])) {
         shengmu = yunmu[0];
         yunmu = yunmu.slice(1);
@@ -59,22 +58,30 @@ const getShuangpinCode = (char: string, pinyinStr: string, currentScheme: Shuang
       yunmu = 'iuv'.includes(yunmu) ? 'i' : yunmu;
     }
 
-    const currentSchemeData = shuangpinSchemes[currentScheme];
-    
     // 查找声母对应的键
     const shengmuKey = Object.keys(currentSchemeData).find(key => {
-      if (shengmu === 'a') return key === 'a';  // 直接匹配 'a' 声母
+      if (shengmu === 'a') return key === 'a';
       return currentSchemeData[key].shengmu === shengmu;
     }) || '';
 
     // 查找韵母对应的键
     const yunmuKey = Object.keys(currentSchemeData).find(key => {
       const keyYunmu = currentSchemeData[key].yunmu;
-      return Array.isArray(keyYunmu) ? keyYunmu.includes(yunmu) : keyYunmu === yunmu;
+      if (Array.isArray(keyYunmu)) {
+        // 如果是数组，检查是否包含当前韵母
+        return keyYunmu.includes(yunmu);
+      } else {
+        // 如果是单个值，直接比较
+        return keyYunmu === yunmu;
+      }
     }) || '';
 
     console.log(`Looking for Shengmu: "${shengmu}" -> Found key: "${shengmuKey}"`);
     console.log(`Looking for Yunmu: "${yunmu}" -> Found key: "${yunmuKey}"`);
+    console.log('Scheme data for debugging:');
+    Object.entries(currentSchemeData).forEach(([key, value]) => {
+      console.log(`Key ${key}:`, value);
+    });
     console.log('=== End Debug Info ===');
 
     return [shengmuKey, yunmuKey] as ShuangpinCode;
