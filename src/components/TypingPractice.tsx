@@ -29,6 +29,11 @@ const getShuangpinCode = (char: string, pinyinStr: string, currentScheme: Shuang
     // 首先将 ü 转换为 v，这样就和实际输入方式一致
     pinyinStr = pinyinStr.replace(/ü/g, 'v');
     
+    // 特殊处理 'er' 韵母
+    if (pinyinStr === 'er') {
+      return ['e', 'r'] as ShuangpinCode;
+    }
+    
     const firstVowelIndex = pinyinStr.search(/[aeiouv]/i);
     let shengmu = pinyinStr.slice(0, firstVowelIndex);
     let yunmu = pinyinStr.slice(firstVowelIndex);
@@ -40,48 +45,46 @@ const getShuangpinCode = (char: string, pinyinStr: string, currentScheme: Shuang
 
     const currentSchemeData = shuangpinSchemes[currentScheme];
     
+    let shengmuKey = '';
+    let yunmuKey = '';
+
     // 处理零声母情况
     if (shengmu === '') {
-      if (yunmu === 'ao') {
-        shengmu = 'a';
-        yunmu = 'o';
-      } else if (['a', 'e', 'i', 'o', 'u'].includes(yunmu[0])) {
-        shengmu = yunmu[0];
-        yunmu = yunmu.slice(1);
-      }
-      console.log(`After zero initial processing - Shengmu: "${shengmu}", Yunmu: "${yunmu}"`);
-    }
-
-    // 处理单韵母情况
-    if (shengmu === '' && yunmu.length === 1) {
-      shengmu = yunmu;
-      yunmu = 'iuv'.includes(yunmu) ? 'i' : yunmu;
-    }
-
-    // 查找声母对应的键
-    const shengmuKey = Object.keys(currentSchemeData).find(key => {
-      if (shengmu === 'a') return key === 'a';
-      return currentSchemeData[key].shengmu === shengmu;
-    }) || '';
-
-    // 查找韵母对应的键
-    const yunmuKey = Object.keys(currentSchemeData).find(key => {
-      const keyYunmu = currentSchemeData[key].yunmu;
-      if (Array.isArray(keyYunmu)) {
-        // 如果是数组，检查是否包含当前韵母
-        return keyYunmu.includes(yunmu);
+      // 零声母时，第一个键总是韵母首字母
+      shengmuKey = yunmu[0];
+      
+      // 如果韵母只有两个字母，且第二个字母是 n, g, r，则第二个键就是这个字母
+      if (yunmu.length === 2 && 'ngr'.includes(yunmu[1])) {
+        yunmuKey = yunmu[1];
       } else {
-        // 如果是单个值，直接比较
-        return keyYunmu === yunmu;
+        // 否则查找韵母映射
+        yunmuKey = Object.keys(currentSchemeData).find(key => {
+          const keyYunmu = currentSchemeData[key].yunmu;
+          if (Array.isArray(keyYunmu)) {
+            return keyYunmu.includes(yunmu);
+          } else {
+            return keyYunmu === yunmu;
+          }
+        }) || '';
       }
-    }) || '';
+    } else {
+      // 有声母的情况
+      shengmuKey = Object.keys(currentSchemeData).find(key => 
+        currentSchemeData[key].shengmu === shengmu
+      ) || '';
+
+      yunmuKey = Object.keys(currentSchemeData).find(key => {
+        const keyYunmu = currentSchemeData[key].yunmu;
+        if (Array.isArray(keyYunmu)) {
+          return keyYunmu.includes(yunmu);
+        } else {
+          return keyYunmu === yunmu;
+        }
+      }) || '';
+    }
 
     console.log(`Looking for Shengmu: "${shengmu}" -> Found key: "${shengmuKey}"`);
     console.log(`Looking for Yunmu: "${yunmu}" -> Found key: "${yunmuKey}"`);
-    console.log('Scheme data for debugging:');
-    Object.entries(currentSchemeData).forEach(([key, value]) => {
-      console.log(`Key ${key}:`, value);
-    });
     console.log('=== End Debug Info ===');
 
     return [shengmuKey, yunmuKey] as ShuangpinCode;
