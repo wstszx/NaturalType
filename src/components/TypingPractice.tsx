@@ -3,7 +3,7 @@ import {
   Box, Typography, Button, Container, Dialog, DialogActions, DialogContent, 
   DialogContentText, DialogTitle, Grid, Select, MenuItem, FormControl, 
   InputLabel, Card, CardContent, LinearProgress, Fab, 
-  useTheme, ThemeProvider, createTheme
+  useTheme, ThemeProvider, createTheme, TextField
 } from '@mui/material';
 import { Brightness4, Brightness7 } from '@mui/icons-material';
 import Keyboard, { LightEffect } from './Keyboard';
@@ -107,11 +107,14 @@ const TypingPractice: React.FC = () => {
   const renderCount = useRef(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [openDonateDialog, setOpenDonateDialog] = useState(false);
+    const [openTextDialog, setOpenTextDialog] = useState(false);
+    const [pastedText, setPastedText] = useState('');
   const [articlePinyin, setArticlePinyin] = useState<string[]>([]);
   const [currentScheme, setCurrentScheme] = useState<ShuangpinSchemeName>("微软双拼");
   const [lightEffect, setLightEffect] = useState<LightEffect>('rainbow');
   const [progress, setProgress] = useState(0);
   const [darkMode, setDarkMode] = useState(false);
+
 
   const theme = useTheme();
   const darkTheme = createTheme({
@@ -208,6 +211,28 @@ const TypingPractice: React.FC = () => {
     setTypedKeys([]);
     setOpenDialog(false);
   };
+
+    const handleOpenTextDialog = () => {
+        setOpenTextDialog(true);
+    };
+
+    const handleCloseTextDialog = () => {
+        setOpenTextDialog(false);
+    };
+
+    const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPastedText(event.target.value);
+    };
+
+    const handleConfirmText = () => {
+        setText(pastedText);
+        setArticlePinyin(getArticlePinyin(pastedText));
+        setCurrentIndex(-1);
+        setCurrentKeyIndex(0);
+        setTypedKeys([]);
+        setOpenTextDialog(false);
+    };
+
 
   const handleOpenDonateDialog = () => {
     setOpenDonateDialog(true);
@@ -367,6 +392,9 @@ const TypingPractice: React.FC = () => {
             <Button variant="contained" color="primary" onClick={handleNextArticle}>
               下一篇文章
             </Button>
+             <Button variant="contained" color="primary" onClick={handleOpenTextDialog}>
+              粘贴文本
+            </Button>
             <Button variant="outlined" color="secondary" onClick={handleOpenDonateDialog}>
               捐赠支持
             </Button>
@@ -413,6 +441,37 @@ const TypingPractice: React.FC = () => {
             </Button>
           </DialogActions>
         </Dialog>
+          <Dialog
+              open={openTextDialog}
+              onClose={handleCloseTextDialog}
+              aria-labelledby="text-dialog-title"
+              aria-describedby="text-dialog-description"
+          >
+              <DialogTitle id="text-dialog-title">
+                  {"粘贴文本"}
+              </DialogTitle>
+              <DialogContent>
+                  <DialogContentText id="text-dialog-description">
+                      请在下方文本框中粘贴您想要练习的文本内容。
+                  </DialogContentText>
+                  <TextField
+                      autoFocus
+                      margin="dense"
+                      id="pasted-text"
+                      label="文本内容"
+                      type="text"
+                      fullWidth
+                      multiline
+                      rows={4}
+                      value={pastedText}
+                      onChange={handleTextChange}
+                  />
+              </DialogContent>
+              <DialogActions>
+                  <Button onClick={handleCloseTextDialog}>取消</Button>
+                  <Button onClick={handleConfirmText}>确认</Button>
+              </DialogActions>
+          </Dialog>
         <Dialog
           open={openDonateDialog}
           onClose={handleCloseDonateDialog}
